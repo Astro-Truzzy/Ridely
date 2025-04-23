@@ -21,7 +21,7 @@ export default function ThankYouPopup({
           clearInterval(interval);
           onClose(); // Close the modal
         }
-      }, 30); // 30ms x 100 = 3s
+      }, 50); // 50ms x 100 = 5s
 
       return () => clearInterval(interval);
     }

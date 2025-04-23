@@ -3,14 +3,13 @@ import { FaCaretDown } from "react-icons/fa";
 import { HiOutlineMenu, HiX } from "react-icons/hi";
 import { MdHome, MdInfoOutline, MdArticle } from "react-icons/md";
 import { FcFaq } from "react-icons/fc";
-import { FaClipboardList } from "react-icons/fa6";
 import blacklogo from "../../assets/Images/black_logo-removebg-preview.png";
 import useScrollDirection from "../../hooks/useScrollDirection";
 const MenuLinks = [
   {
     id: 1,
     name: "Home",
-    link: "#",
+    link: "/#Home",
     icon: MdHome,
   },
   {
@@ -33,12 +32,6 @@ const DropdownLinks = [
     name: "FAQs",
     link: "/#FAQs",
     icon: FcFaq,
-  },
-  {
-    id: 2,
-    name: "Join our waitlist",
-    link: "/#",
-    icon: FaClipboardList,
   },
 ];
 

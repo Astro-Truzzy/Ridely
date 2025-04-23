@@ -13,6 +13,8 @@ import PrioritySec from "./Components/PrioritySec";
 import FaqSection from "./Components/FaqSection";
 import WaitlistModal from "./Components/WaitlistModal";
 import JoinWaitlistSection from "./Components/JoinWaitlistSection";
+import Footer from "./Components/Footer";
+import ContactCTA from "./Components/ContactCTA";
 
 
 AOS.init();
@@ -39,6 +41,8 @@ function App() {
       <WaitlistModal show={modalOpen} onClose={() => setModalOpen(false)} />
         <JoinWaitlistSection/>
       <FaqSection />
+      <ContactCTA/>
+      <Footer/>
     </div>
   );
 }

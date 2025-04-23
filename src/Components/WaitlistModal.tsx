@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { XMarkIcon as XIcon } from "@heroicons/react/24/outline";
 import ThankYouPopup from "./ThankYouPopup"; // Adjust path if needed
+import { RiEBike2Fill } from "react-icons/ri";
+import { FaPerson } from "react-icons/fa6";
 
 export default function WaitlistModal({
   show,
@@ -31,7 +33,7 @@ export default function WaitlistModal({
         setShowPopup(false);
         onClose();
         window.location.href = "/";
-      }, 3000);
+      }, 5000);
       return () => clearTimeout(timeout);
     }
   }, [showPopup, onClose]);
@@ -107,14 +109,14 @@ export default function WaitlistModal({
                     className={buttonClasses}
                     onClick={() => setRole("customer")}
                   >
-                    Register as Customer 👤
+                    Register as Customer <FaPerson className=" inline-block"/>
                   </motion.button>
                   <motion.button
                     whileTap={{ scale: 0.95 }}
                     className={buttonClasses}
                     onClick={() => setRole("rider")}
                   >
-                    Register as Rider 🛵
+                    Register as Rider <RiEBike2Fill className=" inline-block" />
                   </motion.button>
                 </div>
               </>
