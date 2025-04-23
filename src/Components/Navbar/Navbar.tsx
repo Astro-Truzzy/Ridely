@@ -43,7 +43,6 @@ const DropdownLinks = [
 ];
 
 const Navbar = () => {
-  
   const showNavbar = useScrollDirection();
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -52,16 +51,22 @@ const Navbar = () => {
   };
 
   return (
-   <div className={`fixed top-0 left-0 w-full bg-white z-50 shadow-md transition-transform duration-300 ease-in-out transform ${showNavbar || sidebarOpen ? "" : '-translate-y-full'}`}>
-
-
+    <div
+      className={`fixed top-0 left-0 w-full bg-white z-50 shadow-md transition-transform duration-300 ease-in-out transform ${
+        showNavbar || sidebarOpen ? "" : "-translate-y-full"
+      }`}
+    >
       <div className="py-4">
         <div className="container flex items-center justify-between">
           {/* Logo Section */}
           <div className="flex items-center px-3">
             <div className="h-16 w-38 flex items-center justify-center object-contain">
               <a href="#" className="block">
-                <img src={blacklogo} alt="Ridely Logo" className="w-[350px] logo" />
+                <img
+                  src={blacklogo}
+                  alt="Ridely Logo"
+                  className="w-[350px] logo"
+                />
               </a>
             </div>
           </div>

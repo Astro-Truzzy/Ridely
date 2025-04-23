@@ -24,12 +24,12 @@ const Process = () => {
               <img
                 src={signup}
                 alt="signup"
-                className="w-[80px] shadow-2xl transform transition duration-300 group-hover:-translate-y-2"
+                className="w-[80px] shadow-2xl transform transition duration-300 group-hover:-translate-y-2 p-1 rounded-2xl"
               />
               <h2 className="font-semibold text-2xl sm:text-[30px]">Sign Up</h2>
               <p>
-                Lorem ipsum dolor sit, amet consectetur adipisicing elit. Nemo,
-                perspiciatis.
+                Easily create an account in seconds and access a smooth delivery
+                experience instantly.
               </p>
             </div>
 
@@ -42,14 +42,14 @@ const Process = () => {
               <img
                 src={bookrider}
                 alt=""
-                className="w-[80px] shadow-2xl transform transition duration-300 group-hover:-translate-y-2"
+                className="w-[80px] shadow-2xl transform transition duration-300 group-hover:-translate-y-2 rounded-2xl"
               />
               <h2 className="font-semibold text-2xl sm:text-[30px]">
                 Book a Rider
               </h2>
               <p>
-                Lorem, ipsum dolor sit amet consectetur adipisicing elit. Nam,
-                quibusdam.
+                Quickly request a nearby dispatch rider with just a few taps on
+                the app.
               </p>
             </div>
 
@@ -62,14 +62,14 @@ const Process = () => {
               <img
                 src={details}
                 alt=""
-                className="w-[80px] shadow-2xl transform transition duration-300 group-hover:-translate-y-2"
+                className="w-[80px] shadow-2xl transform transition duration-300 group-hover:-translate-y-2 p-1 rounded-2xl"
               />
               <h2 className="font-semibold text-2xl sm:text-[30px]">
                 Enter details
               </h2>
               <p>
-                Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                Deleniti, vitae.
+                Fill in pickup and delivery info, choose parcel size, and get
+                instant cost estimates.
               </p>
             </div>
 
@@ -82,12 +82,12 @@ const Process = () => {
               <img
                 src={otw}
                 alt=""
-                className="w-[80px] shadow-2xl transform transition duration-300 group-hover:-translate-y-2"
+                className="w-[80px] shadow-2xl transform transition duration-300 group-hover:-translate-y-2 px-1 rounded-2xl"
               />
               <h2 className="font-semibold text-2xl sm:text-[30px]">OTW!</h2>
               <p>
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Sequi,
-                molestias!
+                Track your package in real-time and enjoy timely, secure
+                deliveries to your doorstep.
               </p>
             </div>
           </div>

@@ -80,79 +80,86 @@ const Hero: React.FC = () => {
 
   return (
     <section className="container" id="home">
-      <div className="overflow-hidden rounded-3xl min-h-[550px] sm:min-h-[600px] pt-5 bg-white flex justify-center items-center px-5">
-        <div className="container pb-8 sm:pb-0 pl-1">
-          <Slider {...settings}>
-            {HeroData.map((data: HeroItem) => (
-              <div key={data.id}>
-                <div className="grid grid-cols-1 sm:grid-cols-2">
-                  {/* Text Content Section */}
-                  <div className="flex flex-col justify-center gap-4 sm:pl-3 pt-3 sm:pt-0 text-center sm:text-left order-2 sm:order-1 relative z-10">
-                    <h1
-                      data-aos="zoom-out"
-                      data-aos-duration="500"
-                      data-aos-once="true"
-                      className="text-2xl sm:text-4xl lg:text-3xl font-semibold text-gray-700"
-                    >
-                      <p className="text-[30px] flex justify-center sm:justify-start text-[#175aff]">
-                        {data.icon}
+      <div className="flex items-center justify-center p-[1rem] sm:p-[2rem]">
+        <div className="overflow-hidden rounded-3xl min-h-[400px] sm:min-h-[650px] pt-5 bg-white flex justify-center items-center px-5 mt-5">
+          <div className="container pb-8 sm:pb-0 pl-1">
+            <Slider {...settings}>
+              {HeroData.map((data: HeroItem) => (
+                <div key={data.id}>
+                  <div className="grid grid-cols-1 sm:grid-cols-2">
+                    {/* Text Content Section */}
+                    <div className="flex flex-col justify-center gap-4 sm:pl-3 pt-12 sm:pt-0 text-center sm:text-left order-2 sm:order-1 relative z-10">
+                      <h1
+                        data-aos="zoom-out"
+                        data-aos-duration="500"
+                        data-aos-once="true"
+                        className="text-2xl sm:text-4xl lg:text-3xl font-semibold text-gray-700"
+                      >
+                        <p className="text-[30px] flex justify-center sm:justify-start text-[#175aff]">
+                          {data.icon}
+                        </p>
+                        {data.subtitle}
+                      </h1>
+                      <h1
+                        data-aos="zoom-out"
+                        data-aos-duration="500"
+                        data-aos-once="true"
+                        className="text-5xl sm:text-6xl lg:text-7xl font-bold text-gray-900"
+                      >
+                        {data.title}
+                      </h1>
+                      <p
+                        data-aos="fade-left"
+                        data-aos-duration="500"
+                        data-aos-once="true"
+                        className="text-base sm:text-lg text-gray-600 max-w-md"
+                      >
+                        {data.description}
                       </p>
-                      {data.subtitle}
-                    </h1>
-                    <h1
-                      data-aos="zoom-out"
-                      data-aos-duration="500"
-                      data-aos-once="true"
-                      className="text-5xl sm:text-6xl lg:text-7xl font-bold text-gray-900"
-                    >
-                      {data.title}
-                    </h1>
-                    <p
-                      data-aos="fade-left"
-                      data-aos-duration="500"
-                      data-aos-once="true"
-                      className="text-base sm:text-lg text-gray-600 max-w-md"
-                    >
-                      {data.description}
-                    </p>
-                    <h1
-                      data-aos="zoom-out"
-                      data-aos-duration="500"
-                      data-aos-once="true"
-                      className="text-5xl uppercase text-[#175AFF] sm:text-[60px] md:text-[80px] xl:text-[100px] font-bold"
-                    >
-                      {data.title2}
-                    </h1>
-                  </div>
+                      <h1
+                        data-aos="zoom-out"
+                        data-aos-duration="500"
+                        data-aos-once="true"
+                        className="text-5xl uppercase text-[#175AFF] sm:text-[60px] md:text-[80px] xl:text-[100px] font-bold"
+                      >
+                        {data.title2}
+                      </h1>
+                    </div>
 
-                  {/* Image Section */}
-                  <div className="order-1 sm:order-2">
-                    <div
-                      data-aos="fade-right"
-                      data-aos-duration="300"
-                      data-aos-once="true"
-                      data-aos-delay="200"
-                      className="relative z-10"
-                    >
-                      <img
-                        src={data.img}
-                        alt={`${data.title2} illustration`}
-                        className="w-[300px] sm:w-[450px] h-[300px] sm:h-[350px] 
+                    {/* Image Section */}
+                    <div className="order-1 sm:order-2">
+                      <div
+                        data-aos="fade-right"
+                        data-aos-duration="300"
+                        data-aos-once="true"
+                        data-aos-delay="200"
+                        className="relative z-10"
+                      >
+                        <img
+                          src={data.img}
+                          alt={`${data.title2} illustration`}
+                          className="w-[300px] sm:w-[450px] h-[300px] sm:h-[350px] 
                         sm:scale-105 object-contain mx-auto drop-shadow-[-8px_4px_6px_rgba(0,0,0,0.2)] relative z-40"
-                      />
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </Slider>
+              ))}
+            </Slider>
+          </div>
         </div>
       </div>
+
       <div className=" flex items-center justify-center">
         <button
+          data-aos="fade-up"
+          data-aos-duration="400"
+          data-aos-once="false"
+          data-aos-delay="200"
           type="button"
           title="Get Started"
-          className="mt-2 px-4 sm:px-6 py-2 sm:py-3 w-[120px] sm:w-[150px] md:w-[180px] h-[45px] sm:h-[50px] lg:h-[55px]
+          className="mt-[2.5rem] px-4 sm:px-6 py-2 sm:py-3 w-[120px] sm:w-[150px] md:w-[180px] h-[45px] sm:h-[50px] lg:h-[55px]
              bg-[#175aff] text-white text-sm sm:text-base md:text-lg font-semibold
              rounded-xl shadow-md hover:bg-blue-400 transition duration-300"
         >
