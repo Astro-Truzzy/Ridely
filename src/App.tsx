@@ -15,6 +15,7 @@ import WaitlistModal from "./Components/WaitlistModal";
 import JoinWaitlistSection from "./Components/JoinWaitlistSection";
 import Footer from "./Components/Footer";
 import ContactCTA from "./Components/ContactCTA";
+import ScrollToTop from "./Components/MoveToTop/ScrollToTop";
 
 
 AOS.init();
@@ -43,6 +44,7 @@ function App() {
       <FaqSection />
       <ContactCTA/>
       <Footer/>
+      <ScrollToTop/>
     </div>
   );
 }
