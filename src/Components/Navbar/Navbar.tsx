@@ -15,8 +15,8 @@ const MenuLinks = [
   },
   {
     id: 2,
-    name: "About",
-    link: "/#About",
+    name: "Services",
+    link: "/#Services",
     icon: MdInfoOutline,
   },
   {
