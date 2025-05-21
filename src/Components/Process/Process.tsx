@@ -9,7 +9,7 @@ const Process = () => {
       <div className="container">
         {/* Header section */}
         <h1 className="text-3xl font-bold font-serif text-center mt-32 mb-14">
-          <span className="text-[#175AFF]">The</span> Process
+          The <span className="text-[#175AFF]"> Process </span>
         </h1>
 
         {/* Centered Grid */}

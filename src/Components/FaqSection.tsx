@@ -18,13 +18,13 @@ const faqs = [
   {
     question: "What kind of packages can I send with Ridely?",
     answer:
-      "Ridely lets you send anything from small envelopes to medium-sized boxes. Just no live animals or time-traveling devices, please 🚫🐸🕰️.",
+      "Ridely lets you send anything from small envelopes to medium-sized boxes (food, cosmetic products, clothes, vehicle repair parts, and lots more. ). Just no live animals or time-traveling devices, please 🚫🐸🕰️.",
     icon: <FaBox className="text-blue-600 text-xl" />,
   },
   {
     question: "Can I track my delivery in real-time?",
     answer:
-      "Yes! Use our real-time map tracking to watch your package ride like a superhero 🦸📍.",
+      "Yes! Use our real-time map tracking to watch your package ride from pickup to dropoff📍.",
     icon: <FaMapMarkedAlt className="text-blue-600 text-xl" />,
   },
   {
@@ -42,19 +42,19 @@ const faqs = [
   {
     question: "What payment methods do you accept?",
     answer:
-      "We accept cards, mobile payments, and the occasional high-five (just kidding 😄).",
+      "We accept cash, cards, mobile payments, and the occasional high-five (just kidding 😄).",
     icon: <FaCreditCard className="text-blue-600 text-xl" />,
   },
   {
     question: "How fast is Ridely?",
     answer:
-      "Super fast! Most intra-city deliveries are done in under 2 hours 🚀.",
+      "Super fast! Most intra-city deliveries are done in under 30 minutes 🚀.",
     icon: <FaClock className="text-blue-600 text-xl" />,
   },
   {
     question: "Why choose Ridely?",
     answer:
-      "Because sending stuff should be fun, fast, and stress-free. That’s our vibe! 🎉📬",
+      "Ridely combines smart technology, real-time tracking, and reliable riders to deliver packages swiftly and securely. Whether you're a business or individual, our platform ensures convenience, transparency, and peace of mind — every step of the way.📬",
     icon: <FaSmile className="text-blue-600 text-xl" />,
   },
 ];
@@ -68,7 +68,7 @@ export default function FaqSection() {
 
   return (
     <div className="w-full bg-gray-50 py-16 px-4">
-      <section className="max-w-5xl mx-auto">
+      <section className="max-w-5xl mx-auto" id="FAQs">
         <h2 className="text-4xl font-bold text-center mb-10 text-neutral-800">
           <FcFaq className="inline-block mr-2" />
           Frequently Asked Questions

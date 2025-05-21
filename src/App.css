@@ -1,19 +1,10 @@
-.one {
-background: linear-gradient(-45deg, #157aff, #1ca8ff, #145ec0);
-        background-size: 300% 300%;
-        animation: gradientShift 10s ease infinite;
+.loader {
+    border-top-color: #3498db;
+    animation: spin 1s infinite linear;
 }
 
- @keyframes gradientShift {
-     0% {
-         background-position: 0% 50%;
-     }
-
-     50% {
-         background-position: 100% 50%;
-     }
-
-     100% {
-         background-position: 0% 50%;
-     }
- }
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}

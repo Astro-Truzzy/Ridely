@@ -3,25 +3,26 @@ import { FaCaretDown } from "react-icons/fa";
 import { HiOutlineMenu, HiX } from "react-icons/hi";
 import { MdHome, MdInfoOutline, MdArticle } from "react-icons/md";
 import { FcFaq } from "react-icons/fc";
+import { FaTimeline } from "react-icons/fa6";
 import blacklogo from "../../assets/Images/black_logo-removebg-preview.png";
 import useScrollDirection from "../../hooks/useScrollDirection";
 const MenuLinks = [
   {
     id: 1,
     name: "Home",
-    link: "/#Home",
+    link: "#Home",
     icon: MdHome,
   },
   {
     id: 2,
     name: "Services",
-    link: "/#Services",
+    link: "#Services",
     icon: MdInfoOutline,
   },
   {
     id: 3,
     name: "Blogs",
-    link: "/#Blogs",
+    link: "#Blogs",
     icon: MdArticle,
   },
 ];
@@ -30,8 +31,14 @@ const DropdownLinks = [
   {
     id: 1,
     name: "FAQs",
-    link: "/#FAQs",
+    link: "#FAQs",
     icon: FcFaq,
+  },
+  {
+    id: 2,
+    name: "Timeline",
+    link: "#Timeline",
+    icon: FaTimeline,
   },
 ];
 

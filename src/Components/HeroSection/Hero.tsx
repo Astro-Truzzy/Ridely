@@ -8,6 +8,8 @@ import { IoPhonePortraitOutline } from "react-icons/io5";
 import { FaMailchimp } from "react-icons/fa";
 import { IoShieldCheckmarkOutline } from "react-icons/io5";
 import { FaShippingFast } from "react-icons/fa";
+import { useState } from "react";
+import WaitlistModal from "../WaitlistModal";
 
 // Define the shape of a Hero item
 interface HeroItem {
@@ -65,8 +67,14 @@ const HeroData: HeroItem[] = [
 ];
 
 const Hero: React.FC = () => {
+
+const [showModal, setShowModal] = useState(false);
+
+const handleOpenModal = () => setShowModal(true);
+const handleCloseModal = () => setShowModal(false);
+
   const settings = {
-    dots: false,
+    dots: true,
     arrows: false,
     infinite: true,
     speed: 800,
@@ -74,12 +82,12 @@ const Hero: React.FC = () => {
     autoplay: true,
     autoplaySpeed: 4000,
     cssEase: "ease-in-out",
-    pauseOnHover: false,
+    pauseOnHover: true,
     pauseOnFocus: true,
   };
 
   return (
-    <section className="container" id="home">
+    <section className="container" id="Home">
       <div className="flex items-center justify-center p-[1rem] sm:p-[2rem]">
         <div className="overflow-hidden rounded-3xl min-h-[400px] sm:min-h-[650px] pt-5 bg-white flex justify-center items-center px-5 mt-5">
           <div className="container pb-8 sm:pb-0 pl-1">
@@ -159,12 +167,15 @@ const Hero: React.FC = () => {
           data-aos-delay="200"
           type="button"
           title="Get Started"
+          onClick={handleOpenModal}
           className="mt-[2.5rem] px-4 sm:px-6 py-2 sm:py-3 w-[120px] sm:w-[150px] md:w-[180px] h-[45px] sm:h-[50px] lg:h-[55px]
              bg-[#175aff] text-white text-sm sm:text-base md:text-lg font-semibold
              rounded-xl shadow-md hover:bg-blue-400 transition duration-300"
         >
           Get started
         </button>
+        {/* Modal Component */}
+        <WaitlistModal show={showModal} onClose={handleCloseModal} />
       </div>
     </section>
   );

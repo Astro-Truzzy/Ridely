@@ -1,9 +1,10 @@
-import  { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import { Routes, Route } from "react-router-dom";
 import Navbar from "./Components/Navbar/Navbar";
 import Hero from "./Components/HeroSection/Hero";
 import AOS from "aos";
 import "aos/dist/aos.css";
-import "slick-carousel/slick/slick.css"; 
+import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Process from "./Components/Process/Process";
 import "./App.css";
@@ -16,9 +17,12 @@ import JoinWaitlistSection from "./Components/JoinWaitlistSection";
 import Footer from "./Components/Footer";
 import ContactCTA from "./Components/ContactCTA";
 import ScrollToTop from "./Components/MoveToTop/ScrollToTop";
-
+import BlogSection from "./Components/BlogSection";
+import { TimelineDemo } from "./Components/UI/timeline-demo";
+import BlogDetail from "./Components/BlogDetail";
 
 AOS.init();
+
 function App() {
   useEffect(() => {
     AOS.init({
@@ -31,22 +35,40 @@ function App() {
   }, []);
 
   const [modalOpen, setModalOpen] = useState(false);
+
   return (
     <div className="overflow-clip bg-gray-300 h-full pt-20">
-      <Navbar/>
-      <Hero />
-      <BackgroundBoxesDemo />
-      <Process />
-      <HeroHighlightDemo />
-      <PrioritySec />
+      <Navbar />
+      <ScrollToTop />
       <WaitlistModal show={modalOpen} onClose={() => setModalOpen(false)} />
-        <JoinWaitlistSection/>
-      <FaqSection />
-      <ContactCTA/>
-      <Footer/>
-      <ScrollToTop/>
+
+     
+      <Routes>
+        {/* Home Page */}
+        <Route
+          path="/"
+          element={
+            <>
+              <Hero />
+              <BackgroundBoxesDemo />
+              <Process />
+              <HeroHighlightDemo />
+              <PrioritySec />
+              <BlogSection />
+              <TimelineDemo />
+              <JoinWaitlistSection />
+              <FaqSection />
+              <ContactCTA />
+              <Footer />
+            </>
+          }
+        />
+
+        {/* Blog Detail Page */}
+        <Route path="/blog/:id" element={<BlogDetail/>} />
+      </Routes>
     </div>
   );
 }
 
-export default App
+export default App;
