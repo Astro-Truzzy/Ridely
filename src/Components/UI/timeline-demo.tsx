@@ -3,7 +3,7 @@ import Cert from "../../assets/Images/Ridelycert.jpg";
 import Ridely1 from "../../assets/Images/Ridely1.jpg";
 import Ridely2 from "../../assets/Images/Ridely2.jpg";
 import Ridely3 from "../../assets/Images/Ridely pfp (dark).png"
-import Splash from "../../assets/Images/splash.png";
+import Splash from "../../assets/Images/Riderly.png";
 import Mod from "../../assets/Images/BusMod.png"
 import Ridely4 from "../../assets/Images/Ridely4.png";
 import Trust from "../../assets/Images/Trust.jpg";
