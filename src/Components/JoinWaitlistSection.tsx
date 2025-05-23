@@ -7,7 +7,7 @@ const JoinWaitlistSection: React.FC = () => {
   const [isModalOpen, setModalOpen] = React.useState(false);
 
   return (
-    <section className="bg-gray-200 py-16 px-4 text-center" id="waitlist">
+    <section className="bg-gray-200 py-16 px-4 text-center" id="Waitlist">
       <h2 className="text-4xl font-bold text-[#175aff] mb-4">
         Join Our Waitlist <FaClipboardList className="inline-block translate-y-[-0.5rem]" />
       </h2>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset 
+  xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+  <!-- Homepage -->
+  <url>
+    <loc>https://ridelyapp.vercel.app/</loc>
+    <lastmod>2025-05-21</lastmod>
+    <priority>1.00</priority>
+  </url>
+
+  <!-- Blog -->
+  <url>
+    <loc>https://ridelyapp.vercel.app/#Blogs</loc>
+    <lastmod>2025-05-21</lastmod>
+    <priority>0.80</priority>
+  </url>
+
+  <!-- Services -->
+  <url>
+    <loc>https://ridelyapp.vercel.app/#Services</loc>
+    <lastmod>2025-05-21</lastmod>
+    <priority>0.70</priority>
+  </url>
+
+  <!-- Contact -->
+  <url>
+    <loc>https://www.ridelyapp.vercel.app/#Contact</loc>
+    <lastmod>2025-05-21</lastmod>
+    <priority>0.70</priority>
+  </url>
+
+  <!-- Waitlist -->
+  <url>
+    <loc>https://www.ridelyapp.vercel.app/#Waitlist</loc>
+    <lastmod>2025-05-21</lastmod>
+    <priority>0.60</priority>
+  </url>
+
+</urlset>
+<!-- This sitemap is auto-generated. -->

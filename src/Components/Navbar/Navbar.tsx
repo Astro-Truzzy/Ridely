@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { FaCaretDown } from "react-icons/fa";
 import { HiOutlineMenu, HiX } from "react-icons/hi";
-import { MdHome, MdInfoOutline, MdArticle } from "react-icons/md";
+import { MdHome, MdInfoOutline, MdArticle, MdOutlineConnectWithoutContact } from "react-icons/md";
+import { FaClipboardList } from "react-icons/fa6";
 import { FcFaq } from "react-icons/fc";
 import { FaTimeline } from "react-icons/fa6";
 import blacklogo from "../../assets/Images/black_logo-removebg-preview.png";
@@ -25,6 +26,12 @@ const MenuLinks = [
     link: "#Blogs",
     icon: MdArticle,
   },
+  {
+    id: 4,
+    name: "Contact",
+    link: "#Contact",
+    icon: MdOutlineConnectWithoutContact,
+  },
 ];
 
 const DropdownLinks = [
@@ -39,6 +46,12 @@ const DropdownLinks = [
     name: "Timeline",
     link: "#Timeline",
     icon: FaTimeline,
+  },
+  {
+    id: 3,
+    name: "Waitlist",
+    link: "#Waitlist",
+    icon: FaClipboardList,
   },
 ];
 

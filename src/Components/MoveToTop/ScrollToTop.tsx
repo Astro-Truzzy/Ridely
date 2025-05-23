@@ -4,7 +4,6 @@ import { FaArrowUp } from "react-icons/fa";
 const ScrollToTop = () => {
   const [isVisible, setIsVisible] = useState(false);
 
-  // Show button when the user scrolls down 300px
   const toggleVisibility = () => {
     if (window.scrollY > 300) {
       setIsVisible(true);
@@ -13,7 +12,7 @@ const ScrollToTop = () => {
     }
   };
 
-  // Scroll to the top of the page
+  
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
@@ -21,7 +20,7 @@ const ScrollToTop = () => {
     });
   };
 
-  // Add scroll event listener when the component mounts
+
   useEffect(() => {
     window.addEventListener("scroll", toggleVisibility);
     return () => {
@@ -36,7 +35,7 @@ const ScrollToTop = () => {
           onClick={scrollToTop}
           title="Scroll to top"
           className="p-3 bg-black/50 text-white hover:text-white rounded-full shadow-md hover:bg-black/5 transition-all duration-300
-          dark:bg-white/75 dark:text-black text-[20px]"
+          dark:bg-white/75 dark:text-black text-[20px] z-auto"
         >
           <FaArrowUp />
         </button>

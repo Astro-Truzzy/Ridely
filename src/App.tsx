@@ -20,6 +20,7 @@ import ScrollToTop from "./Components/MoveToTop/ScrollToTop";
 import BlogSection from "./Components/BlogSection";
 import { TimelineDemo } from "./Components/UI/timeline-demo";
 import BlogDetail from "./Components/BlogDetail";
+import { Helmet } from "react-helmet";
 
 AOS.init();
 
@@ -38,11 +39,18 @@ function App() {
 
   return (
     <div className="overflow-clip bg-gray-300 h-full pt-20">
+      <Helmet>
+        <title>Ridely – Fast, Reliable, and Trackable Package Delivery</title>
+        <meta
+          name="description"
+          content="Ridely helps you send and receive parcels easily with real-time rider tracking, affordable rates, and low-risk delivery."
+        />
+        <link rel="canonical" href="https://www.ridelyapp.vercel.app/" />
+      </Helmet>
       <Navbar />
       <ScrollToTop />
       <WaitlistModal show={modalOpen} onClose={() => setModalOpen(false)} />
 
-     
       <Routes>
         {/* Home Page */}
         <Route
@@ -65,7 +73,7 @@ function App() {
         />
 
         {/* Blog Detail Page */}
-        <Route path="/blog/:id" element={<BlogDetail/>} />
+        <Route path="/blog/:id" element={<BlogDetail />} />
       </Routes>
     </div>
   );
