@@ -5,37 +5,29 @@
   <!-- Homepage -->
   <url>
     <loc>https://ridelyapp.vercel.app/</loc>
-    <lastmod>2025-05-21</lastmod>
+    <lastmod>2025-05-26</lastmod>
     <priority>1.00</priority>
   </url>
 
-  <!-- Blog -->
+  <!-- Blog Section (just points to homepage for now) -->
   <url>
-    <loc>https://ridelyapp.vercel.app/#Blogs</loc>
-    <lastmod>2025-05-21</lastmod>
+    <loc>https://ridelyapp.vercel.app/blog</loc>
+    <lastmod>2025-05-26</lastmod>
     <priority>0.80</priority>
   </url>
 
-  <!-- Services -->
+  <!-- Contact Section -->
   <url>
-    <loc>https://ridelyapp.vercel.app/#Services</loc>
-    <lastmod>2025-05-21</lastmod>
-    <priority>0.70</priority>
-  </url>
-
-  <!-- Contact -->
-  <url>
-    <loc>https://www.ridelyapp.vercel.app/#Contact</loc>
-    <lastmod>2025-05-21</lastmod>
+    <loc>https://ridelyapp.vercel.app/contact</loc>
+    <lastmod>2025-05-26</lastmod>
     <priority>0.70</priority>
   </url>
 
   <!-- Waitlist -->
   <url>
-    <loc>https://www.ridelyapp.vercel.app/#Waitlist</loc>
-    <lastmod>2025-05-21</lastmod>
+    <loc>https://ridelyapp.vercel.app/waitlist</loc>
+    <lastmod>2025-05-26</lastmod>
     <priority>0.60</priority>
   </url>
 
 </urlset>
-<!-- This sitemap is auto-generated. -->
