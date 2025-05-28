@@ -411,14 +411,16 @@ export function GlobeDemo() {
           className="div"
         >
           <h2 className="text-center text-xl md:text-2xl font-bold text-black dark:text-white">
-           Ridely's Global Vision: Connecting the World Through Smart Deliveries
+            Ridely's Global Vision:{" "}
+            <span className="text-[#157aff]"> Connecting the World</span>{" "}
+            Through <span className="text-[#157aff]"> Smart Deliveries </span>
           </h2>
           <p className="text-center text-base md:text-sm font-normal text-neutral-700 dark:text-neutral-200 max-w-md mt-2 mx-auto">
-            At Ridely, we're not just delivering parcels — we’re delivering
-            progress. 🌍 As our globe spins, so does our ambition to
-            scale across borders and connect more people with smarter, faster
-            deliveries. This is just the beginning — ride with us as we go
-            global.
+            At <span className="text-[#157aff]">Ridely</span>, we're not just
+            delivering parcels — we’re delivering progress. As our globe
+            spins, so does our ambition to scale across borders and connect more
+            people with smarter, faster deliveries. This is just the beginning —
+            ride with us as we go global.
           </p>
         </motion.div>
         <div className="absolute w-full bottom-0 inset-x-0 h-40 bg-gradient-to-b pointer-events-none select-none from-transparent dark:to-black to-white z-40" />
