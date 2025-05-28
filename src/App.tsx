@@ -21,6 +21,7 @@ import BlogSection from "./Components/BlogSection";
 import { TimelineDemo } from "./Components/UI/timeline-demo";
 import BlogDetail from "./Components/BlogDetail";
 import { Helmet } from "react-helmet";
+import { GlobeDemo } from "./Components/UI/globe-demo";
 
 AOS.init();
 
@@ -62,6 +63,7 @@ function App() {
               <Process />
               <HeroHighlightDemo />
               <PrioritySec />
+              <GlobeDemo/>
               <BlogSection />
               <TimelineDemo />
               <JoinWaitlistSection />

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { CheckCircle } from "lucide-react"; // Optional icon
+import { CheckCircle } from "lucide-react"; 
 
 export default function ThankYouPopup({
   show,
@@ -19,7 +19,7 @@ export default function ThankYouPopup({
         setProgress(start);
         if (start >= 100) {
           clearInterval(interval);
-          onClose(); // Close the modal
+          onClose(); 
         }
       }, 50); // 50ms x 100 = 5s
 

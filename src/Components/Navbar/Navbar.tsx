@@ -37,21 +37,21 @@ const MenuLinks = [
 const DropdownLinks = [
   {
     id: 1,
-    name: "FAQs",
-    link: "#FAQs",
-    icon: FcFaq,
-  },
-  {
-    id: 2,
     name: "Timeline",
     link: "#Timeline",
     icon: FaTimeline,
   },
   {
-    id: 3,
+    id: 2,
     name: "Waitlist",
     link: "#Waitlist",
     icon: FaClipboardList,
+  },
+  {
+    id: 3,
+    name: "FAQs",
+    link: "#FAQs",
+    icon: FcFaq,
   },
 ];
 
@@ -93,7 +93,7 @@ const Navbar = () => {
                   <li key={data.id}>
                     <a
                       href={data.link}
-                      className="inline-flex items-center gap-1 px-4 font-semibold text-black hover:text-gray-500 duration-200"
+                      className="inline-flex items-center gap-1 px-4 font-semibold text-black hover:text-[#157aff] duration-200"
                     >
                       <Icon className="text-xl" />
                       {data.name}
