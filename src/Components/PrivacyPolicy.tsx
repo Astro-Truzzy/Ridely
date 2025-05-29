@@ -25,7 +25,7 @@ const PrivacyPolicy: React.FC = () => {
             <PDFDownloadLink
               document={<PrivacyPolicyPDF />}
               fileName="ridely-privacy-policy.pdf"
-              className="bg-[#157aff] text-white px-4 py-2 rounded-xl shadow-md hover:bg-blue-700 transition cursor-pointer"
+              className="bg-[#157aff] text-white px-4 py-2 rounded-xl shadow-md hover:bg-blue-700 transition cursor-pointer sm:text-base text-sm font-semibold flex items-center gap-2"
             >
               {({ loading }) => (loading ? "Preparing..." : "Download PDF")}
             </PDFDownloadLink>
@@ -77,7 +77,6 @@ const PrivacyPolicy: React.FC = () => {
             >
               support@ridely.app
             </a>
-            .
           </p>
 
           <h2 className="text-2xl font-semibold mt-4">
