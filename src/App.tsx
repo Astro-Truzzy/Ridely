@@ -22,6 +22,8 @@ import { TimelineDemo } from "./Components/UI/timeline-demo";
 import BlogDetail from "./Components/BlogDetail";
 import { Helmet } from "react-helmet";
 import { GlobeDemo } from "./Components/UI/globe-demo";
+import PrivacyPolicy from "./Components/PrivacyPolicy";
+import CookieNotice from "./Components/CookieNotice";
 
 AOS.init();
 
@@ -70,12 +72,13 @@ function App() {
               <FaqSection />
               <ContactCTA />
               <Footer />
+              <CookieNotice/>
             </>
           }
         />
-
         {/* Blog Detail Page */}
         <Route path="/blog/:id" element={<BlogDetail />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
       </Routes>
     </div>
   );

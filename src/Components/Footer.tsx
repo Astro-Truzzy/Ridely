@@ -6,6 +6,7 @@ import {
   FaGithub,
 } from "react-icons/fa"; 
 import { motion } from "framer-motion"; 
+import { Link } from "react-router";
 
 export default function Footer() {
   return (
@@ -15,7 +16,9 @@ export default function Footer() {
         <div className="grid md:grid-cols-3 gap-8">
           <div>
             <h2 className="text-xl font-semibold mb-4">Ridely</h2>
-            <p className="text-sm mb-2">19, Ewanbor str, Benin-city, Nigeria.</p>
+            <p className="text-sm mb-2">
+              19, Ewanbor str, Benin-city, Nigeria.
+            </p>
             <p className="text-sm mb-2">Email: Ridely.inc@gmail.com</p>
             <p className="text-sm mb-2">Phone: +234 916 503 2925</p>
           </div>
@@ -43,6 +46,11 @@ export default function Footer() {
                 <a href="#Contact" className="hover:underline">
                   Contact
                 </a>
+              </li>
+              <li>
+                <Link to="/privacy-policy" className="hover:underline">
+                Privacy Policy
+                </Link>
               </li>
             </ul>
           </div>
