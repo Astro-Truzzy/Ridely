@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, memo } from "react";
 import { FaCaretDown } from "react-icons/fa";
 import { HiOutlineMenu, HiX } from "react-icons/hi";
 import { MdHome, MdInfoOutline, MdArticle } from "react-icons/md";
@@ -65,6 +65,7 @@ const Navbar = () => {
                 <img
                   src={blacklogo}
                   alt="Ridely Logo"
+                  loading="eager"
                   className="w-[350px] logo"
                 />
               </a>
@@ -137,59 +138,69 @@ const Navbar = () => {
       </div>
 
       {/* Sidebar (Mobile) */}
-      {sidebarOpen && (
-        <div className="fixed inset-0 z-50">
-          <div
-            className="absolute inset-0 bg-black opacity-50"
+      <div
+        className={`fixed inset-0 z-50 transition-opacity duration-300 ${
+          sidebarOpen
+            ? "opacity-100 pointer-events-auto"
+            : "opacity-0 pointer-events-none"
+        }`}
+      >
+        <div
+          className={`absolute inset-0 bg-black transition-opacity duration-300 ${
+            sidebarOpen ? "opacity-50" : "opacity-0"
+          }`}
+          onClick={toggleSidebar}
+        ></div>
+        <div
+          className={`absolute left-0 top-0 h-full w-64 bg-[#175AFF] shadow-lg p-6 transform transition-transform duration-300 ease-out ${
+            sidebarOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
+        >
+          <button
             onClick={toggleSidebar}
-          ></div>
-          <div className="absolute left-0 top-0 h-full w-64 bg-[#175AFF] shadow-lg p-6 transform transition-transform ease-out duration-500">
-            <button
-              onClick={toggleSidebar}
-              className="mb-4"
-              aria-label="Close Sidebar"
-            >
-              <HiX className="w-6 h-6 text-white" />
-            </button>
-            <ul>
-              {MenuLinks.map((data) => {
-                const Icon = data.icon;
-                return (
-                  <li key={data.id} className="mb-4">
+            className="mb-4"
+            aria-label="Close Sidebar"
+          >
+            <HiX className="w-6 h-6 text-white" />
+          </button>
+          <ul>
+            {MenuLinks.map((data) => {
+              const Icon = data.icon;
+              return (
+                <li key={data.id} className="mb-4">
+                  <a
+                    href={data.link}
+                    className="flex items-center gap-2 px-4 py-2 font-semibold text-white hover:text-gray-300 duration-200"
+                    onClick={toggleSidebar}
+                  >
+                    <Icon className="text-xl" />
+                    {data.name}
+                  </a>
+                </li>
+              );
+            })}
+            <li className="mt-4">
+              <div className="font-semibold text-white mb-2">Quick Links</div>
+              <ul className="ml-4">
+                {DropdownLinks.map((data) => (
+                  <li key={data.id} className="mb-2">
                     <a
                       href={data.link}
                       className="flex items-center gap-2 px-4 py-2 font-semibold text-white hover:text-gray-300 duration-200"
                       onClick={toggleSidebar}
                     >
-                      <Icon className="text-xl" />
+                      {data.icon && <data.icon className="text-xl" />}
                       {data.name}
                     </a>
                   </li>
-                );
-              })}
-              <li className="mt-4">
-                <div className="font-semibold text-white mb-2">Quick Links</div>
-                <ul className="ml-4">
-                  {DropdownLinks.map((data) => (
-                    <li key={data.id} className="mb-2">
-                      <a
-                        href={data.link}
-                        className="flex items-center gap-2 px-4 py-2 font-semibold text-white hover:text-gray-300 duration-200"
-                        onClick={toggleSidebar}
-                      >
-                        {data.icon && <data.icon className="text-xl" />}
-                        {data.name}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </li>
-            </ul>
-          </div>
+                ))}
+              </ul>
+            </li>
+          </ul>
         </div>
-      )}
+      </div>
     </div>
   );
 };
 
-export default Navbar;
+export default memo(Navbar);

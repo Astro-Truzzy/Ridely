@@ -1,0 +1,14 @@
+# robots.txt for Ridely
+User-agent: *
+Allow: /
+
+# Prevent indexing of URL variations
+Disallow: /*?
+Disallow: /*#*
+
+# Sitemap location
+Sitemap: https://ridelyapp.vercel.app/sitemap.xml
+
+# Disallow admin or private areas if any
+# Disallow: /admin/
+# Disallow: /private/

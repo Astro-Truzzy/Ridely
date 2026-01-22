@@ -1,12 +1,13 @@
+import { memo } from "react";
 import signup from "../../assets/Images/signup.png";
 import bookrider from "../../assets/Images/upscalemedia-transformed (1).png";
 import details from "../../assets/Images/package-location-3d-icon-download-in-png-blend-fbx-gltf-file-formats--parcel-delivery-tracking-and-navigation-pack-services-icons-7191762-removebg-preview.png";
 import otw from "../../assets/Images/delivered-removebg-preview.png";
 
-const Process = () => {
+const Process = memo(() => {
   return (
     <section className="my-12">
-      <div className="container">
+      <div className="container mx-auto">
         {/* Header section */}
         <h1 className="text-3xl font-bold font-serif text-center mt-32 mb-14">
           The <span className="text-[#175AFF]"> Process </span>
@@ -14,7 +15,7 @@ const Process = () => {
 
         {/* Centered Grid */}
         <div className="flex justify-center">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 justify-items-center">
             <div
               data-aos="fade-up"
               data-aos-duration="200"
@@ -24,6 +25,7 @@ const Process = () => {
               <img
                 src={signup}
                 alt="signup"
+                loading="lazy"
                 className="w-[80px] shadow-2xl transform transition duration-300 group-hover:-translate-y-2 p-1 rounded-2xl"
               />
               <h2 className="font-semibold text-2xl sm:text-[30px]">Sign Up</h2>
@@ -41,7 +43,8 @@ const Process = () => {
             >
               <img
                 src={bookrider}
-                alt=""
+                alt="Book a rider"
+                loading="lazy"
                 className="w-[80px] shadow-2xl transform transition duration-300 group-hover:-translate-y-2 rounded-2xl"
               />
               <h2 className="font-semibold text-2xl sm:text-[30px]">
@@ -61,7 +64,8 @@ const Process = () => {
             >
               <img
                 src={details}
-                alt=""
+                alt="Enter details"
+                loading="lazy"
                 className="w-[80px] shadow-2xl transform transition duration-300 group-hover:-translate-y-2 p-1 rounded-2xl"
               />
               <h2 className="font-semibold text-2xl sm:text-[30px]">
@@ -81,7 +85,8 @@ const Process = () => {
             >
               <img
                 src={otw}
-                alt=""
+                alt="On the way delivery"
+                loading="lazy"
                 className="w-[80px] shadow-2xl transform transition duration-300 group-hover:-translate-y-2 px-1 rounded-2xl"
               />
               <h2 className="font-semibold text-2xl sm:text-[30px]">OTW!</h2>
@@ -95,6 +100,8 @@ const Process = () => {
       </div>
     </section>
   );
-};
+});
+
+Process.displayName = 'Process';
 
 export default Process;

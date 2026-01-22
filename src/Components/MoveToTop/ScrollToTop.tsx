@@ -1,25 +1,25 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, memo, useCallback } from "react";
 import { FaArrowUp } from "react-icons/fa";
 
-const ScrollToTop = () => {
+const ScrollToTop = memo(() => {
   const [isVisible, setIsVisible] = useState(false);
 
   // Show button when the user scrolls down 300px
-  const toggleVisibility = () => {
+  const toggleVisibility = useCallback(() => {
     if (window.scrollY > 300) {
       setIsVisible(true);
     } else {
       setIsVisible(false);
     }
-  };
+  }, []);
 
   // Scroll to the top of the page
-  const scrollToTop = () => {
+  const scrollToTop = useCallback(() => {
     window.scrollTo({
       top: 0,
       behavior: "smooth",
     });
-  };
+  }, []);
 
   // Add scroll event listener when the component mounts
   useEffect(() => {
@@ -27,10 +27,10 @@ const ScrollToTop = () => {
     return () => {
       window.removeEventListener("scroll", toggleVisibility);
     };
-  }, []);
+  }, [toggleVisibility]);
 
   return (
-    <div className="fixed bottom-10 right-10">
+    <div className="fixed bottom-10 right-10 z-[9999]">
       {isVisible && (
         <button
           onClick={scrollToTop}
@@ -43,6 +43,8 @@ const ScrollToTop = () => {
       )}
     </div>
   );
-};
+});
+
+ScrollToTop.displayName = 'ScrollToTop';
 
 export default ScrollToTop;

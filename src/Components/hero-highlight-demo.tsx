@@ -49,7 +49,7 @@ export default function HeroHighlightDemo() {
           viewport={{ once: false }}
           className="absolute w-54 md:w-72 lg:w-65  rounded-2xl overflow-hidden z-0 translate-x-[85px] translate-y-[-35px]"
         >
-          <img src={images[2]} alt="Mockup 3" className="w-full h-auto" />
+          <img src={images[2]} alt="Mockup 3" loading="lazy" className="w-full h-auto" />
         </motion.div>
 
         {/* Middle Image */}
@@ -60,7 +60,7 @@ export default function HeroHighlightDemo() {
           viewport={{ once: false }}
           className="absolute w-54 md:w-72 lg:w-65  rounded-2xl overflow-hidden z-10 transform ease-out translate-x-[-85px] translate-y-[-30px]"
         >
-          <img src={images[1]} alt="Mockup 2" className="w-full h-auto" />
+          <img src={images[1]} alt="Mockup 2" loading="lazy" className="w-full h-auto" />
         </motion.div>
 
         {/* Top Image */}
@@ -71,7 +71,7 @@ export default function HeroHighlightDemo() {
           viewport={{ once: false }}
           className="relative w-54 md:w-72 lg:w-70  rounded-2xl overflow-hidden z-20 translate-y-7"
         >
-          <img src={images[0]} alt="Mockup 1" className="w-full h-auto" />
+          <img src={images[0]} alt="Mockup 1" loading="lazy" className="w-full h-auto" />
         </motion.div>
       </div>
     </HeroHighlight>

@@ -1,27 +1,53 @@
-import { useEffect, useState } from "react";
-import { Routes, Route } from "react-router-dom";
+import { useEffect, useState, lazy, Suspense } from "react";
+import { Routes, Route, useLocation } from "react-router-dom";
+import { Helmet } from "react-helmet";
 import Navbar from "./Components/Navbar/Navbar";
-import Hero from "./Components/HeroSection/Hero";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import Process from "./Components/Process/Process";
 import "./App.css";
-import BackgroundBoxesDemo from "./Components/background-boxes-demo";
-import HeroHighlightDemo from "./Components/hero-highlight-demo";
-import PrioritySec from "./Components/PrioritySec";
-import FaqSection from "./Components/FaqSection";
-import WaitlistModal from "./Components/WaitlistModal";
-import JoinWaitlistSection from "./Components/JoinWaitlistSection";
-import Footer from "./Components/Footer";
-import ContactCTA from "./Components/ContactCTA";
 import ScrollToTop from "./Components/MoveToTop/ScrollToTop";
-import BlogSection from "./Components/BlogSection";
-import { TimelineDemo } from "./Components/UI/timeline-demo";
-import BlogDetail from "./Components/BlogDetail";
+import WaitlistModal from "./Components/WaitlistModal";
 
-AOS.init();
+// Lazy load components for code splitting
+const Hero = lazy(() => import("./Components/HeroSection/Hero"));
+const Process = lazy(() => import("./Components/Process/Process"));
+const BackgroundBoxesDemo = lazy(() => import("./Components/background-boxes-demo"));
+const HeroHighlightDemo = lazy(() => import("./Components/hero-highlight-demo"));
+const PrioritySec = lazy(() => import("./Components/PrioritySec"));
+const FaqSection = lazy(() => import("./Components/FaqSection"));
+const JoinWaitlistSection = lazy(() => import("./Components/JoinWaitlistSection"));
+const Footer = lazy(() => import("./Components/Footer"));
+const ContactCTA = lazy(() => import("./Components/ContactCTA"));
+const BlogSection = lazy(() => import("./Components/BlogSection"));
+const TimelineDemo = lazy(() => 
+  import("./Components/UI/timeline-demo").then(module => ({ default: module.TimelineDemo }))
+);
+const BlogDetail = lazy(() => import("./Components/BlogDetail"));
+
+// Loading fallback component
+const LoadingFallback = () => (
+  <div className="flex items-center justify-center min-h-[200px]">
+    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#175AFF]"></div>
+  </div>
+);
+
+// Component to handle canonical tags for all routes
+const CanonicalTag = () => {
+  const location = useLocation();
+  const siteUrl = "https://ridelyapp.vercel.app";
+  
+  // Remove trailing slash and ensure clean URL
+  const pathname = location.pathname === "/" ? "" : location.pathname.replace(/\/$/, "");
+  const canonicalUrl = `${siteUrl}${pathname}`;
+  
+  return (
+    <Helmet>
+      <link rel="canonical" href={canonicalUrl} />
+    </Helmet>
+  );
+};
 
 function App() {
   useEffect(() => {
@@ -30,6 +56,7 @@ function App() {
       easing: "ease-in-sine",
       delay: 100,
       offset: 100,
+      once: true, // Optimize: animations only once
     });
     AOS.refresh();
   }, []);
@@ -38,6 +65,7 @@ function App() {
 
   return (
     <div className="overflow-clip bg-gray-300 h-full pt-20">
+      <CanonicalTag />
       <Navbar />
       <ScrollToTop />
       <WaitlistModal show={modalOpen} onClose={() => setModalOpen(false)} />
@@ -48,7 +76,7 @@ function App() {
         <Route
           path="/"
           element={
-            <>
+            <Suspense fallback={<LoadingFallback />}>
               <Hero />
               <BackgroundBoxesDemo />
               <Process />
@@ -60,12 +88,19 @@ function App() {
               <FaqSection />
               <ContactCTA />
               <Footer />
-            </>
+            </Suspense>
           }
         />
 
         {/* Blog Detail Page */}
-        <Route path="/blog/:id" element={<BlogDetail/>} />
+        <Route 
+          path="/blog/:id" 
+          element={
+            <Suspense fallback={<LoadingFallback />}>
+              <BlogDetail />
+            </Suspense>
+          } 
+        />
       </Routes>
     </div>
   );

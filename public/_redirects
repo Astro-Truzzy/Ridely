@@ -1,0 +1,8 @@
+# Vercel redirects to handle canonical URLs
+# Redirect www to non-www (if you have a custom domain)
+# www.ridelyapp.vercel.app/* https://ridelyapp.vercel.app/:splat 301
+
+# Redirect trailing slashes (optional - handled in code)
+# /*/ /:splat 301
+
+# Redirect HTTP to HTTPS (handled by Vercel automatically)

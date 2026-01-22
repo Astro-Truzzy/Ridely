@@ -6,6 +6,21 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineConfig({
   plugins: [
     react(),
-  tailwindcss(),
+    tailwindcss(),
   ],
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+          'animation-vendor': ['aos', 'framer-motion', 'motion'],
+          'slider-vendor': ['react-slick', 'slick-carousel'],
+        },
+      },
+    },
+    chunkSizeWarningLimit: 1000,
+  },
+  optimizeDeps: {
+    include: ['react', 'react-dom', 'react-router-dom'],
+  },
 })

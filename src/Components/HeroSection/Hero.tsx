@@ -66,32 +66,32 @@ const HeroData: HeroItem[] = [
   },
 ];
 
+// Move settings outside component to prevent recreation on every render
+const sliderSettings = {
+  dots: true,
+  arrows: false,
+  infinite: true,
+  speed: 800,
+  slidesToScroll: 1,
+  autoplay: true,
+  autoplaySpeed: 4000,
+  cssEase: "ease-in-out",
+  pauseOnHover: true,
+  pauseOnFocus: true,
+};
+
 const Hero: React.FC = () => {
+  const [showModal, setShowModal] = useState(false);
 
-const [showModal, setShowModal] = useState(false);
-
-const handleOpenModal = () => setShowModal(true);
-const handleCloseModal = () => setShowModal(false);
-
-  const settings = {
-    dots: true,
-    arrows: false,
-    infinite: true,
-    speed: 800,
-    slidesToScroll: 1,
-    autoplay: true,
-    autoplaySpeed: 4000,
-    cssEase: "ease-in-out",
-    pauseOnHover: true,
-    pauseOnFocus: true,
-  };
+  const handleOpenModal = () => setShowModal(true);
+  const handleCloseModal = () => setShowModal(false);
 
   return (
-    <section className="container" id="Home">
+    <section className="container mx-auto" id="Home">
       <div className="flex items-center justify-center p-[1rem] sm:p-[2rem]">
         <div className="overflow-hidden rounded-3xl min-h-[400px] sm:min-h-[650px] pt-5 bg-white flex justify-center items-center px-5 mt-5">
-          <div className="container pb-8 sm:pb-0 pl-1">
-            <Slider {...settings}>
+          <div className="container mx-auto pb-8 sm:pb-0">
+            <Slider {...sliderSettings}>
               {HeroData.map((data: HeroItem) => (
                 <div key={data.id}>
                   <div className="grid grid-cols-1 sm:grid-cols-2">
@@ -146,6 +146,7 @@ const handleCloseModal = () => setShowModal(false);
                         <img
                           src={data.img}
                           alt={`${data.title2} illustration`}
+                          loading="lazy"
                           className="w-[300px] sm:w-[450px] h-[300px] sm:h-[350px] 
                         sm:scale-105 object-contain mx-auto drop-shadow-[-8px_4px_6px_rgba(0,0,0,0.2)] relative z-40"
                         />

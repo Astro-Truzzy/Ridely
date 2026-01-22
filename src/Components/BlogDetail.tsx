@@ -147,7 +147,9 @@ const relatedPosts = blogDetails
   )
   .slice(0, 2);
 
-const currentUrl = window.location.href;
+// Use clean canonical URL without query params or fragments
+const siteUrl = "https://ridelyapp.vercel.app";
+const currentUrl = `${siteUrl}/blog/${id}`;
 
 const handleCommentSubmit = (e: React.FormEvent) => {
   e.preventDefault();
@@ -162,16 +164,62 @@ const handleCommentSubmit = (e: React.FormEvent) => {
     <>
       <Helmet>
         <title>{post.title} | Ridely Blog</title>
-        <meta name="description" content={post.content.slice(0, 150)} />
+        <meta name="description" content={post.content.slice(0, 160) + "..."} />
+        <meta name="keywords" content={post.tags?.join(", ") || "Ridely, delivery, logistics"} />
+        <meta name="author" content={post.author} />
+        <meta name="robots" content="index, follow" />
+        
+        {/* Open Graph / Facebook */}
+        <meta property="og:type" content="article" />
         <meta property="og:title" content={post.title} />
-        <meta property="og:description" content={post.content.slice(0, 150)} />
-        <meta
-          property="og:image"
-          content={window.location.origin + post.image}
-        />
+        <meta property="og:description" content={post.content.slice(0, 160) + "..."} />
+        <meta property="og:image" content={window.location.origin + post.image} />
         <meta property="og:url" content={currentUrl} />
+        <meta property="og:site_name" content="Ridely" />
+        <meta property="article:author" content={post.author} />
+        <meta property="article:published_time" content={post.date} />
+        {post.tags && post.tags.map((tag, index) => (
+          <meta key={index} property="article:tag" content={tag} />
+        ))}
+        
+        {/* Twitter */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={post.title} />
+        <meta name="twitter:description" content={post.content.slice(0, 160) + "..."} />
+        <meta name="twitter:image" content={window.location.origin + post.image} />
+        
+        {/* Canonical URL - Always use clean URL without query params or fragments */}
+        <link rel="canonical" href={currentUrl || `${siteUrl}/blog/${id}`} />
+        
+        {/* Structured Data for Blog Post */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BlogPosting",
+            "headline": post.title,
+            "description": post.content.slice(0, 160) + "...",
+            "image": window.location.origin + post.image,
+            "datePublished": post.date,
+            "dateModified": post.date,
+            "author": {
+              "@type": "Person",
+              "name": post.author
+            },
+            "publisher": {
+              "@type": "Organization",
+              "name": "Ridely",
+              "logo": {
+                "@type": "ImageObject",
+                "url": window.location.origin + "/logo.png"
+              }
+            },
+            "mainEntityOfPage": {
+              "@type": "WebPage",
+              "@id": currentUrl
+            }
+          })}
+        </script>
       </Helmet>
-      ;
       <motion.section
         className="max-w-4xl mx-auto p-6 md:p-12 bg-white rounded-lg shadow-lg my-10"
         initial={{ opacity: 0, y: 20 }}
