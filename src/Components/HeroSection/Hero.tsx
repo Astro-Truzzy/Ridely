@@ -89,7 +89,7 @@ const Hero: React.FC = () => {
   return (
     <section className="container mx-auto" id="Home">
       <div className="flex items-center justify-center p-[1rem] sm:p-[2rem]">
-        <div className="overflow-hidden rounded-3xl min-h-[400px] sm:min-h-[650px] pt-5 bg-white flex justify-center items-center px-5 mt-5">
+        <div className="overflow-hidden rounded-3xl min-h-[400px] sm:min-h-[650px] pt-5 bg-white dark:bg-gray-800 flex justify-center items-center px-5 mt-5 transition-colors duration-200">
           <div className="container mx-auto pb-8 sm:pb-0">
             <Slider {...sliderSettings}>
               {HeroData.map((data: HeroItem) => (
@@ -101,7 +101,7 @@ const Hero: React.FC = () => {
                         data-aos="zoom-out"
                         data-aos-duration="500"
                         data-aos-once="true"
-                        className="text-2xl sm:text-4xl lg:text-3xl font-semibold text-gray-700"
+                        className="text-2xl sm:text-4xl lg:text-3xl font-semibold text-gray-700 dark:text-gray-300"
                       >
                         <p className="text-[30px] flex justify-center sm:justify-start text-[#175aff]">
                           {data.icon}
@@ -112,7 +112,7 @@ const Hero: React.FC = () => {
                         data-aos="zoom-out"
                         data-aos-duration="500"
                         data-aos-once="true"
-                        className="text-5xl sm:text-6xl lg:text-7xl font-bold text-gray-900"
+                        className="text-5xl sm:text-6xl lg:text-7xl font-bold text-gray-900 dark:text-white"
                       >
                         {data.title}
                       </h1>
@@ -120,7 +120,7 @@ const Hero: React.FC = () => {
                         data-aos="fade-left"
                         data-aos-duration="500"
                         data-aos-once="true"
-                        className="text-base sm:text-lg text-gray-600 max-w-md"
+                        className="text-base sm:text-lg text-gray-600 dark:text-gray-400 max-w-md"
                       >
                         {data.description}
                       </p>

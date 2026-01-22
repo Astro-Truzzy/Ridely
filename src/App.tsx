@@ -9,6 +9,7 @@ import "slick-carousel/slick/slick-theme.css";
 import "./App.css";
 import ScrollToTop from "./Components/MoveToTop/ScrollToTop";
 import WaitlistModal from "./Components/WaitlistModal";
+import { ThemeProvider } from "./contexts/ThemeContext";
 
 // Lazy load components for code splitting
 const Hero = lazy(() => import("./Components/HeroSection/Hero"));
@@ -64,14 +65,15 @@ function App() {
   const [modalOpen, setModalOpen] = useState(false);
 
   return (
-    <div className="overflow-clip bg-gray-300 h-full pt-20">
-      <CanonicalTag />
-      <Navbar />
-      <ScrollToTop />
-      <WaitlistModal show={modalOpen} onClose={() => setModalOpen(false)} />
+    <ThemeProvider>
+      <div className="overflow-clip bg-gray-300 dark:bg-gray-900 h-full pt-20 transition-colors duration-200">
+        <CanonicalTag />
+        <Navbar />
+        <ScrollToTop />
+        <WaitlistModal show={modalOpen} onClose={() => setModalOpen(false)} />
 
-     
-      <Routes>
+       
+        <Routes>
         {/* Home Page */}
         <Route
           path="/"
@@ -102,7 +104,8 @@ function App() {
           } 
         />
       </Routes>
-    </div>
+      </div>
+    </ThemeProvider>
   );
 }
 

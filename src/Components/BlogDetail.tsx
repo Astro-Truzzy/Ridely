@@ -117,9 +117,9 @@ useEffect(() => {
 
 if (!post) {
   return (
-    <div className="p-10 text-center">
-      <h2 className="text-2xl font-bold mb-4">Post Not Found</h2>
-      <p className="mb-6">
+    <div className="p-10 text-center bg-gray-50 dark:bg-gray-900 min-h-screen">
+      <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Post Not Found</h2>
+      <p className="mb-6 text-gray-700 dark:text-gray-300">
         Sorry, the blog post you are looking for does not exist.
       </p>
       <button
@@ -221,7 +221,7 @@ const handleCommentSubmit = (e: React.FormEvent) => {
         </script>
       </Helmet>
       <motion.section
-        className="max-w-4xl mx-auto p-6 md:p-12 bg-white rounded-lg shadow-lg my-10"
+        className="max-w-4xl mx-auto p-6 md:p-12 bg-white dark:bg-gray-800 rounded-lg shadow-lg my-10 transition-colors duration-200"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
@@ -234,11 +234,11 @@ const handleCommentSubmit = (e: React.FormEvent) => {
         <h1 className="text-3xl md:text-4xl font-bold text-[#175aff] mb-4">
           {post.title}
         </h1>
-        <div className="text-sm text-gray-500 mb-6 flex flex-col md:flex-row md:justify-between">
+        <div className="text-sm text-gray-500 dark:text-gray-400 mb-6 flex flex-col md:flex-row md:justify-between">
           <span>By {post.author}</span>
           <span>{post.date}</span>
         </div>
-        <article className="text-gray-800 whitespace-pre-line leading-relaxed mb-10 text-base md:text-lg">
+        <article className="text-gray-800 dark:text-gray-200 whitespace-pre-line leading-relaxed mb-10 text-base md:text-lg">
           {post.content}
         </article>
 
@@ -247,7 +247,7 @@ const handleCommentSubmit = (e: React.FormEvent) => {
           {postId > 1 && (
             <Link
               to={`/blog/${postId - 1}`}
-              className="text-blue-600 hover:underline"
+              className="text-blue-600 dark:text-blue-400 hover:underline"
             >
               ← Previous Post
             </Link>
@@ -300,13 +300,13 @@ const handleCommentSubmit = (e: React.FormEvent) => {
 
         {/* Comments */}
         <section className="mb-10">
-          <h3 className="text-xl font-semibold mb-4">Comments</h3>
+          <h3 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Comments</h3>
 
           <form onSubmit={handleCommentSubmit} className="mb-6 space-y-3">
             <input
               type="text"
               placeholder="Your Name"
-              className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
               value={commentInput.name}
               onChange={(e) =>
                 setCommentInput({ ...commentInput, name: e.target.value })
@@ -315,7 +315,7 @@ const handleCommentSubmit = (e: React.FormEvent) => {
             />
             <textarea
               placeholder="Your Comment"
-              className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
               rows={3}
               value={commentInput.comment}
               onChange={(e) =>
@@ -333,14 +333,14 @@ const handleCommentSubmit = (e: React.FormEvent) => {
 
           <div>
             {comments.length === 0 ? (
-              <p className="text-gray-500">
+              <p className="text-gray-500 dark:text-gray-400">
                 No comments yet. Be the first to comment!
               </p>
             ) : (
               comments.map((c, i) => (
-                <div key={i} className="mb-4 border-b border-gray-200 pb-3">
-                  <p className="font-semibold">{c.name}</p>
-                  <p className="text-gray-700 whitespace-pre-line">
+                <div key={i} className="mb-4 border-b border-gray-200 dark:border-gray-700 pb-3">
+                  <p className="font-semibold text-gray-900 dark:text-white">{c.name}</p>
+                  <p className="text-gray-700 dark:text-gray-300 whitespace-pre-line">
                     {c.comment}
                   </p>
                 </div>
@@ -353,13 +353,13 @@ const handleCommentSubmit = (e: React.FormEvent) => {
         {relatedPosts.length > 0 && (
           <section className="mb-10">
             <div className="mt-14">
-              <h3 className="text-2xl font-semibold mb-6">Related Posts</h3>
+              <h3 className="text-2xl font-semibold mb-6 text-gray-900 dark:text-white">Related Posts</h3>
               <div className="grid md:grid-cols-2 gap-6">
                 {relatedPosts.map((related) => (
                   <motion.div
                     key={related.id}
                     whileHover={{ scale: 1.03 }}
-                    className="bg-gray-50 rounded-lg shadow p-4"
+                    className="bg-gray-50 dark:bg-gray-700 rounded-lg shadow p-4 transition-colors duration-200"
                   >
                     <Link to={`/blog/${related.id}`}>
                       <img
@@ -367,10 +367,10 @@ const handleCommentSubmit = (e: React.FormEvent) => {
                         alt={related.title}
                         className="rounded-md mb-3 h-40 object-cover w-full"
                       />
-                      <h4 className="text-xl font-bold text-[#175aff]">
+                      <h4 className="text-xl font-bold text-[#175aff] dark:text-blue-400">
                         {related.title}
                       </h4>
-                      <p className="text-gray-600 text-sm mt-1">
+                      <p className="text-gray-600 dark:text-gray-400 text-sm mt-1">
                         {related.date}
                       </p>
                     </Link>

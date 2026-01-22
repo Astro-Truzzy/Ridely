@@ -3,12 +3,12 @@ import { HiMail } from "react-icons/hi";
 
 export default function ContactCTA() {
   return (
-    <section className="bg-gray-300 py-12 px-6 text-center" id="Contact">
+    <section className="bg-gray-300 dark:bg-gray-800 py-12 px-6 text-center transition-colors duration-200" id="Contact">
       <div className="max-w-3xl mx-auto">
-        <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-4">
+        <h2 className="text-2xl md:text-3xl font-bold text-gray-800 dark:text-white mb-4">
           Got Questions or Feedback?
         </h2>
-        <p className="text-gray-600 text-md md:text-lg mb-6">
+        <p className="text-gray-600 dark:text-gray-400 text-md md:text-lg mb-6">
           We’d love to hear from you! If you have any inquiries or suggestions,
           simply click the button below to shoot us an email.
         </p>

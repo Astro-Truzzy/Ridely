@@ -67,9 +67,9 @@ export default function FaqSection() {
   };
 
   return (
-    <div className="w-full bg-gray-50 py-16 px-4">
+    <div className="w-full bg-gray-50 dark:bg-gray-800 py-16 px-4 transition-colors duration-200">
       <section className="max-w-5xl mx-auto" id="FAQs">
-        <h2 className="text-4xl font-bold text-center mb-10 text-neutral-800">
+        <h2 className="text-4xl font-bold text-center mb-10 text-neutral-800 dark:text-white">
           <FcFaq className="inline-block mr-2" />
           Frequently Asked Questions
         </h2>
@@ -77,20 +77,20 @@ export default function FaqSection() {
           {faqs.map((faq, index) => (
             <div
               key={index}
-              className="border border-gray-200 rounded-lg shadow-md transition-all duration-300 bg-white"
+              className="border border-gray-200 dark:border-gray-700 rounded-lg shadow-md transition-all duration-300 bg-white dark:bg-gray-700"
             >
               <button
                 onClick={() => toggleFAQ(index)}
                 className="w-full flex items-center justify-between p-4 text-left"
               >
-                <div className="flex gap-3 items-center text-gray-800 font-semibold text-lg">
+                <div className="flex gap-3 items-center text-gray-800 dark:text-gray-200 font-semibold text-lg">
                   {faq.icon} {faq.question}
                 </div>
                 <motion.div
                   animate={{ rotate: openIndex === index ? 180 : 0 }}
                   transition={{ type: "spring", stiffness: 200 }}
                 >
-                  <IoIosArrowDown className="text-2xl text-gray-500" />
+                  <IoIosArrowDown className="text-2xl text-gray-500 dark:text-gray-400" />
                 </motion.div>
               </button>
               <AnimatePresence initial={false}>
@@ -100,7 +100,7 @@ export default function FaqSection() {
                     animate={{ opacity: 1, height: "auto" }}
                     exit={{ opacity: 0, height: 0 }}
                     transition={{ duration: 0.2 }}
-                    className="px-4 pb-4 text-gray-600"
+                    className="px-4 pb-4 text-gray-600 dark:text-gray-300"
                   >
                     {faq.answer}
                   </motion.div>

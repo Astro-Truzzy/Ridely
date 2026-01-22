@@ -7,6 +7,7 @@ import { FcFaq } from "react-icons/fc";
 import { FaTimeline } from "react-icons/fa6";
 import blacklogo from "../../assets/Images/black_logo-removebg-preview.png";
 import useScrollDirection from "../../hooks/useScrollDirection";
+import DarkModeToggle from "../DarkModeToggle";
 const MenuLinks = [
   {
     id: 1,
@@ -65,7 +66,7 @@ const Navbar = () => {
 
   return (
     <div
-      className={`fixed top-0 left-0 w-full bg-white z-50 shadow-md transition-transform duration-300 ease-in-out transform ${
+      className={`fixed top-0 left-0 w-full bg-white dark:bg-gray-900 z-50 shadow-md transition-transform duration-300 ease-in-out transform ${
         showNavbar || sidebarOpen ? "" : "-translate-y-full"
       }`}
     >
@@ -94,7 +95,7 @@ const Navbar = () => {
                   <li key={data.id}>
                     <a
                       href={data.link}
-                      className="inline-flex items-center gap-1 px-4 font-semibold text-black hover:text-[#157aff] duration-200"
+                      className="inline-flex items-center gap-1 px-4 font-semibold text-black dark:text-white hover:text-[#157aff] dark:hover:text-[#157aff] duration-200"
                     >
                       <Icon className="text-xl" />
                       {data.name}
@@ -106,21 +107,22 @@ const Navbar = () => {
           </div>
 
           {/* Quick Links Dropdown (Desktop) */}
-          <div className="hidden lg:flex items-center px-3">
+          <div className="hidden lg:flex items-center gap-4 px-3">
+            <DarkModeToggle />
             <div className="relative group">
               <a
                 href="#"
-                className="flex items-center gap-2 font-semibold text-black py-2 hover:text-gray-500"
+                className="flex items-center gap-2 font-semibold text-black dark:text-white py-2 hover:text-gray-500 dark:hover:text-gray-400"
               >
                 Quick Links
                 <FaCaretDown className="group-hover:rotate-180 duration-300" />
               </a>
-              <div className="absolute right-0 z-[9999] hidden group-hover:block w-[200px] rounded-md bg-white shadow-md p-2 text-[#175AFF]">
+              <div className="absolute right-0 z-[9999] hidden group-hover:block w-[200px] rounded-md bg-white dark:bg-gray-800 shadow-md p-2 text-[#175AFF] dark:text-[#157aff]">
                 <ul className="space-y-2">
                   {DropdownLinks.map((data) => (
                     <li key={data.id}>
                       <a
-                        className="flex items-center gap-2 w-full p-2 rounded-md font-semibold hover:bg-[#175AFF]/10 hover:text-[#175AFF] duration-200"
+                        className="flex items-center gap-2 w-full p-2 rounded-md font-semibold hover:bg-[#175AFF]/10 dark:hover:bg-[#175AFF]/20 hover:text-[#175AFF] dark:hover:text-[#157aff] duration-200"
                         href={data.link}
                       >
                         {data.icon && <data.icon className="text-xl" />}
@@ -133,17 +135,18 @@ const Navbar = () => {
             </div>
           </div>
 
-          {/* Mobile Menu Button */}
-          <div className="block lg:hidden px-3">
+          {/* Mobile Menu Button and Dark Mode Toggle */}
+          <div className="block lg:hidden px-3 flex items-center gap-2">
+            <DarkModeToggle />
             <button
               onClick={toggleSidebar}
               className="p-2"
               aria-label="Toggle Menu"
             >
               {sidebarOpen ? (
-                <HiX className="w-6 h-6 text-black" />
+                <HiX className="w-6 h-6 text-black dark:text-white" />
               ) : (
-                <HiOutlineMenu className="w-6 h-6 text-black" />
+                <HiOutlineMenu className="w-6 h-6 text-black dark:text-white" />
               )}
             </button>
           </div>
@@ -208,6 +211,11 @@ const Navbar = () => {
                   </li>
                 ))}
               </ul>
+            </li>
+            <li className="mt-4">
+              <div className="px-4 py-2">
+                <DarkModeToggle variant="sidebar" />
+              </div>
             </li>
           </ul>
         </div>

@@ -45,7 +45,7 @@ const featureData = [
 const PrioritySec = () => {
   return (
     <section
-      className="w-full py-12 px-6 md:px-16 bg-white text-black pb-[3rem] pt-[8rem]"
+      className="w-full py-12 px-6 md:px-16 bg-white dark:bg-gray-800 text-black dark:text-white pb-[3rem] pt-[8rem] transition-colors duration-200"
       id="Services"
     >
       <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-12">
@@ -67,7 +67,7 @@ const PrioritySec = () => {
             initial={{ opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
-            className="text-3xl md:text-4xl font-bold text-gray-900"
+            className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white"
           >
             Your Package
             <br />
@@ -78,7 +78,7 @@ const PrioritySec = () => {
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2, duration: 0.5 }}
-            className="text-gray-600 max-w-xl"
+            className="text-gray-600 dark:text-gray-400 max-w-xl"
           >
             Whether you need to deliver a small package or deliver in bulk,
             Ridely is here to make the process seamless.
@@ -105,7 +105,7 @@ const PrioritySec = () => {
                   <h4 className="text-lg font-semibold text-[#175aff]">
                     {item.title}
                   </h4>
-                  <p className="text-sm text-gray-600">{item.desc}</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">{item.desc}</p>
                 </div>
               </motion.div>
             ))}

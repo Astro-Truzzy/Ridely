@@ -29,7 +29,7 @@ export function TimelineDemo() {
       title: "September, 2024",
       content: (
         <div>
-          <p className="mb-8 text-xs font-normal text-neutral-800 md:text-sm dark:text-neutral-200">
+          <p className="mb-8 text-xs font-normal text-neutral-200 md:text-sm">
             The founder envisioned the concept behind Ridely and began
             developing the platform from the ground up, turning an idea into
             action.
@@ -75,19 +75,19 @@ export function TimelineDemo() {
       title: "Early November, 2024",
       content: (
         <div>
-          <p className="mb-8 text-xs font-normal text-neutral-800 md:text-sm dark:text-neutral-200">
+          <p className="mb-8 text-xs font-normal text-neutral-200 md:text-sm">
             By mid-November, Ridely formed its pioneering team — a powerhouse of
             talent including a front-end developer, two back-end engineers, a
             product designer, and a business strategist.
           </p>
-          <p className="mb-8 text-xs font-normal text-neutral-800 md:text-sm dark:text-neutral-200">
+          <p className="mb-8 text-xs font-normal text-neutral-200 md:text-sm">
             United by a bold vision, they brought energy, expertise, and
             relentless drive to kickstart Ridely’s journey.
           </p>
-          <div className="flex items-center gap-2 text-xs text-neutral-700 md:text-sm dark:text-neutral-300">
+          <div className="flex items-center gap-2 text-xs text-neutral-300 md:text-sm">
             ✅ Bootstrapped
           </div>
-          <div className="flex items-center gap-2 text-xs text-neutral-700 md:text-sm dark:text-neutral-300">
+          <div className="flex items-center gap-2 text-xs text-neutral-300 md:text-sm">
             ✅ Started building the Ridely app
           </div>
           <div className="grid grid-cols-2 gap-4 mt-2">
@@ -131,14 +131,14 @@ export function TimelineDemo() {
       title: "Mid November, 2024",
       content: (
         <div>
-          <p className="mb-8 text-xs font-normal text-neutral-800 md:text-sm dark:text-neutral-200">
+          <p className="mb-8 text-xs font-normal text-neutral-200 md:text-sm">
             In a competitive field of seven innovative teams, Ridely emerged as
             a standout, earning 2nd place at the Techstars Hackathon. The team —
             made up of the founder, a fullstack developer, and a business
             strategist — impressed judges with a clear, scalable vision for
             transforming parcel delivery through technology.
           </p>
-          <p className="mb-8 text-xs font-normal text-neutral-800 md:text-sm dark:text-neutral-200">
+          <p className="mb-8 text-xs font-normal text-neutral-200 md:text-sm">
             This early milestone validated Ridely’s potential to solve
             real-world logistics challenges with precision and innovation. The
             experience sharpened the team’s strategy, strengthened their
@@ -186,12 +186,12 @@ export function TimelineDemo() {
       title: "Mid January, 2025",
       content: (
         <div>
-          <p className="mb-8 text-xs font-normal text-neutral-800 md:text-sm dark:text-neutral-200">
+          <p className="mb-8 text-xs font-normal text-neutral-200 md:text-sm">
             On January 14th, Ridely marked a major milestone by officially
             registering as a Limited Liability Company, laying the legal
             foundation for future growth and operations.
           </p>
-          <p className="mb-8 text-xs font-normal text-neutral-800 md:text-sm dark:text-neutral-200">
+          <p className="mb-8 text-xs font-normal text-neutral-200 md:text-sm">
             This formal recognition not only established our legal identity but
             also positioned us to operate more strategically, build investor
             confidence, and scale our logistics innovation with greater
@@ -242,19 +242,19 @@ export function TimelineDemo() {
             Where we are today
           </p>
           <div className="mb-8">
-            <div className="flex items-center gap-2 text-xs text-neutral-700 md:text-sm dark:text-neutral-300">
+            <div className="flex items-center gap-2 text-xs text-neutral-300 md:text-sm">
               ✅ Official website launched (formerly a landing page)
             </div>
-            <div className="flex items-center gap-2 text-xs text-neutral-700 md:text-sm dark:text-neutral-300">
+            <div className="flex items-center gap-2 text-xs text-neutral-300 md:text-sm">
               🌍 Expanding operations to Port Harcourt city
             </div>
-            <div className="flex items-center gap-2 text-xs text-neutral-700 md:text-sm dark:text-neutral-300">
+            <div className="flex items-center gap-2 text-xs text-neutral-300 md:text-sm">
               🛵 Rider recruitment now open
             </div>
-            <div className="flex items-center gap-2 text-xs text-neutral-700 md:text-sm dark:text-neutral-300">
+            <div className="flex items-center gap-2 text-xs text-neutral-300 md:text-sm">
               📝 Users can now join the waitlist
             </div>
-            <div className="flex items-center gap-2 text-xs text-neutral-700 md:text-sm dark:text-neutral-300">
+            <div className="flex items-center gap-2 text-xs text-neutral-300 md:text-sm">
               🚀 MVP launching soon
             </div>
           </div>

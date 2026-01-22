@@ -32,7 +32,7 @@ export default function HeroHighlightDemo() {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.2 }}
           viewport={{ once: true }}
-          className="text-gray-300 text-lg md:text-xl"
+          className="text-gray-400 text-lg md:text-xl"
         >
           Our platform is designed with user experience in mind. Easily track
           deliveries in real-time and manage logistics with just a few taps.

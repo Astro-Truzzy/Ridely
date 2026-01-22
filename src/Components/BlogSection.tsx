@@ -66,12 +66,12 @@ const BlogSection: React.FC = () => {
   const totalPages = Math.ceil(allPosts.length / POSTS_PER_PAGE);
 
   return (
-    <section className="py-16 px-6 md:px-16 bg-gray-50 text-black" id="Blogs">
+    <section className="py-16 px-6 md:px-16 bg-gray-50 dark:bg-gray-800 text-black dark:text-white transition-colors duration-200" id="Blogs">
       <div className="text-center mb-12">
-        <h2 className="text-3xl md:text-4xl font-bold text-gray-900">
+        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">
           Ridely <span className="text-[#175aff]"> Blog </span>
         </h2>
-        <p className="text-gray-600 mt-2">
+        <p className="text-gray-600 dark:text-gray-400 mt-2">
           Stories, milestones, and moments from our journey.
         </p>
       </div>
@@ -86,7 +86,7 @@ const BlogSection: React.FC = () => {
             {paginatedPosts.map((post) => (
               <motion.div
                 key={post.id}
-                className="bg-white rounded-xl shadow-md overflow-hidden flex flex-col"
+                className="bg-white dark:bg-gray-700 rounded-xl shadow-md overflow-hidden flex flex-col transition-colors duration-200"
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4 }}
@@ -100,10 +100,10 @@ const BlogSection: React.FC = () => {
                   <h3 className="text-xl font-semibold text-[#175aff]">
                     {post.title}
                   </h3>
-                  <p className="text-gray-600 mt-2 text-sm flex-grow">
+                  <p className="text-gray-600 dark:text-gray-300 mt-2 text-sm flex-grow">
                     {post.description}
                   </p>
-                  <div className="text-sm text-gray-500 mt-4">
+                  <div className="text-sm text-gray-500 dark:text-gray-400 mt-4">
                     <p>By {post.author}</p>
                     <p>{post.date}</p>
                   </div>
@@ -127,7 +127,7 @@ const BlogSection: React.FC = () => {
                 className={`px-4 py-2 rounded-full border ${
                   currentPage === i + 1
                     ? "bg-blue-600 text-white"
-                    : "bg-white text-blue-600 border-blue-600"
+                    : "bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 border-blue-600 dark:border-blue-400"
                 } hover:bg-blue-600 hover:text-white transition`}
               >
                 {i + 1}

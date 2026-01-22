@@ -9,7 +9,7 @@ const Process = memo(() => {
     <section className="my-12">
       <div className="container mx-auto">
         {/* Header section */}
-        <h1 className="text-3xl font-bold font-serif text-center mt-32 mb-14">
+        <h1 className="text-3xl font-bold font-serif text-center mt-32 mb-14 text-gray-900 dark:text-white">
           The <span className="text-[#175AFF]"> Process </span>
         </h1>
 
