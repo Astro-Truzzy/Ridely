@@ -1,7 +1,8 @@
 import { useState, memo } from "react";
 import { FaCaretDown } from "react-icons/fa";
 import { HiOutlineMenu, HiX } from "react-icons/hi";
-import { MdHome, MdInfoOutline, MdArticle } from "react-icons/md";
+import { MdHome, MdInfoOutline, MdArticle, MdOutlineConnectWithoutContact } from "react-icons/md";
+import { FaClipboardList } from "react-icons/fa6";
 import { FcFaq } from "react-icons/fc";
 import { FaTimeline } from "react-icons/fa6";
 import blacklogo from "../../assets/Images/black_logo-removebg-preview.png";
@@ -25,20 +26,32 @@ const MenuLinks = [
     link: "#Blogs",
     icon: MdArticle,
   },
+  {
+    id: 4,
+    name: "Contact",
+    link: "#Contact",
+    icon: MdOutlineConnectWithoutContact,
+  },
 ];
 
 const DropdownLinks = [
   {
     id: 1,
-    name: "FAQs",
-    link: "#FAQs",
-    icon: FcFaq,
-  },
-  {
-    id: 2,
     name: "Timeline",
     link: "#Timeline",
     icon: FaTimeline,
+  },
+  {
+    id: 2,
+    name: "Waitlist",
+    link: "#Waitlist",
+    icon: FaClipboardList,
+  },
+  {
+    id: 3,
+    name: "FAQs",
+    link: "#FAQs",
+    icon: FcFaq,
   },
 ];
 
@@ -81,7 +94,7 @@ const Navbar = () => {
                   <li key={data.id}>
                     <a
                       href={data.link}
-                      className="inline-flex items-center gap-1 px-4 font-semibold text-black hover:text-gray-500 duration-200"
+                      className="inline-flex items-center gap-1 px-4 font-semibold text-black hover:text-[#157aff] duration-200"
                     >
                       <Icon className="text-xl" />
                       {data.name}

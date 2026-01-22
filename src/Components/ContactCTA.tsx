@@ -3,7 +3,7 @@ import { HiMail } from "react-icons/hi";
 
 export default function ContactCTA() {
   return (
-    <section className="bg-gray-300 py-12 px-6 text-center">
+    <section className="bg-gray-300 py-12 px-6 text-center" id="Contact">
       <div className="max-w-3xl mx-auto">
         <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-4">
           Got Questions or Feedback?

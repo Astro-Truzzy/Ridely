@@ -6,6 +6,7 @@ import {
   FaGithub,
 } from "react-icons/fa"; 
 import { motion } from "framer-motion"; 
+import { Link } from "react-router";
 
 export default function Footer() {
   return (
@@ -15,7 +16,9 @@ export default function Footer() {
         <div className="grid md:grid-cols-3 gap-8">
           <div>
             <h2 className="text-xl font-semibold mb-4">Ridely</h2>
-            <p className="text-sm mb-2">19, Ewanbor str, Benin-city, Nigeria.</p>
+            <p className="text-sm mb-2">
+              19, Ewanbor str, Benin-city, Nigeria.
+            </p>
             <p className="text-sm mb-2">Email: Ridely.inc@gmail.com</p>
             <p className="text-sm mb-2">Phone: +234 916 503 2925</p>
           </div>
@@ -25,29 +28,29 @@ export default function Footer() {
             <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
             <ul className="text-sm space-y-2">
               <li>
-                <a href="/" className="hover:underline">
+                <a href="#Home" className="hover:underline">
                   Home
                 </a>
               </li>
               <li>
-                <a href="/about" className="hover:underline">
+                <a href="#Timeline" className="hover:underline">
                   About Us
                 </a>
               </li>
               <li>
-                <a href="#services" className="hover:underline">
+                <a href="#Services" className="hover:underline">
                   Services
                 </a>
               </li>
               <li>
-                <a href="/contact" className="hover:underline">
+                <a href="#Contact" className="hover:underline">
                   Contact
                 </a>
               </li>
               <li>
-                <a href="/privacy-policy" className="hover:underline">
-                  Privacy Policy
-                </a>
+                <Link to="/privacy-policy" className="hover:underline">
+                Privacy Policy
+                </Link>
               </li>
             </ul>
           </div>
@@ -60,6 +63,7 @@ export default function Footer() {
                 href="https://www.facebook.com/ridely"
                 target="_blank"
                 rel="noopener noreferrer"
+                title="Visit Ridely on Facebook"
               >
                 <motion.div
                   whileHover={{ scale: 1.1 }}
@@ -72,6 +76,7 @@ export default function Footer() {
                 href="https://twitter.com/ridely"
                 target="_blank"
                 rel="noopener noreferrer"
+                title="Visit Ridely on Twitter"
               >
                 <motion.div
                   whileHover={{ scale: 1.1 }}
@@ -84,6 +89,7 @@ export default function Footer() {
                 href="https://www.instagram.com/ridely"
                 target="_blank"
                 rel="noopener noreferrer"
+                title="Visit Ridely on Instagram"
               >
                 <motion.div
                   whileHover={{ scale: 1.1 }}
@@ -96,6 +102,7 @@ export default function Footer() {
                 href="https://www.linkedin.com/company/ridely"
                 target="_blank"
                 rel="noopener noreferrer"
+                title="Visit Ridely on LinkedIn"
               >
                 <motion.div
                   whileHover={{ scale: 1.1 }}
@@ -105,9 +112,10 @@ export default function Footer() {
                 </motion.div>
               </a>
               <a
-                href="https://github.com/ridely"
+                href="https://github.com/Ridely-LTD"
                 target="_blank"
                 rel="noopener noreferrer"
+                title="Visit Ridely on GitHub"
               >
                 <motion.div
                   whileHover={{ scale: 1.1 }}
