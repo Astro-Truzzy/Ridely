@@ -5,7 +5,8 @@ import Image1 from "../../assets/Illustrations/book.png";
 import Image2 from "../../assets/Illustrations/locationparcel.png";
 import Image3 from "../../assets/Illustrations/doorstep.png";
 import Image4 from "../../assets/Illustrations/savetime.png";
-import heroBgVideo from "../../assets/videos/hero-bg-4k.mp4";
+import heroBgVideo from "../../assets/videos/2859-163617349_medium.mp4";
+import heroPoster from "../../assets/generated/hero-bg.jpg";
 import { IoPhonePortraitOutline } from "react-icons/io5";
 import { FaMailchimp } from "react-icons/fa";
 import { IoShieldCheckmarkOutline } from "react-icons/io5";
@@ -132,10 +133,12 @@ const Hero: React.FC = () => {
       <div className="absolute inset-0 z-0">
         <video
           src={heroBgVideo}
+          poster={heroPoster}
           autoPlay
           muted
           loop
           playsInline
+          preload="metadata"
           className="w-full h-full object-cover"
           aria-hidden="true"
         />
@@ -190,6 +193,8 @@ const Hero: React.FC = () => {
                     <img
                       src={data.img}
                       alt={`${data.title2} illustration`}
+                      loading={data.id === 1 ? "eager" : "lazy"}
+                      decoding="async"
                       className="w-[240px] sm:w-[320px] lg:w-[380px] h-auto object-contain drop-shadow-2xl"
                     />
                   </div>

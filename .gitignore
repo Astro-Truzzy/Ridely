@@ -11,6 +11,7 @@ node_modules
 dist
 dist-ssr
 .tools/
+src/assets/videos/hero-bg-4k.mp4
 *.local
 .env
 .env.*
