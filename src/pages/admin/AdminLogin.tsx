@@ -1,7 +1,7 @@
 import { FormEvent, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { adminLogin } from "../lib/admin";
-import ridelyLogo from "../assets/brand";
+import { adminLogin } from "../../Lib/admin";
+import ridelyLogo from "../../assets/brand";
 
 export default function AdminLogin() {
   const navigate = useNavigate();

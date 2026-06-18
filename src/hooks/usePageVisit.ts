@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { trackPageVisit } from "../lib/visit";
+import { trackPageVisit } from "../Lib/visit";
 
 export function usePageVisit() {
   const { pathname } = useLocation();

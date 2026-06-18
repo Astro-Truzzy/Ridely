@@ -5,7 +5,7 @@ import { XMarkIcon as XIcon } from "@heroicons/react/24/outline";
 import ThankYouPopup from "./ThankYouPopup";
 import { RiEBike2Fill } from "react-icons/ri";
 import { FaPerson } from "react-icons/fa6";
-import { submitWaitlistSignup } from "../lib/waitlist";
+import { submitWaitlistSignup } from "../Lib/waitlist";
 
 export default function WaitlistModal({
   show,

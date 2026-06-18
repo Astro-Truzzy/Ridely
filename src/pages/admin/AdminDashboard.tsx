@@ -7,7 +7,7 @@ import {
   getAdminToken,
   type DashboardStats,
   type WaitlistSignup,
-} from "../../lib/admin";
+} from "../../Lib/admin";
 import ridelyLogo from "../../assets/brand";
 
 function StatCard({
