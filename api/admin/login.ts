@@ -1,0 +1,36 @@
+import type { VercelRequest, VercelResponse } from "@vercel/node";
+import { createAdminToken, verifyAdminPassword } from "../_lib/auth";
+import { corsHeaders } from "../_lib/cors";
+
+export default async function handler(req: VercelRequest, res: VercelResponse) {
+  const headers = corsHeaders(req.headers.origin, "POST, OPTIONS");
+
+  if (req.method === "OPTIONS") {
+    return res
+      .status(204)
+      .setHeader("Access-Control-Allow-Origin", headers["Access-Control-Allow-Origin"])
+      .end();
+  }
+
+  Object.entries(headers).forEach(([key, value]) => res.setHeader(key, value));
+
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
+  }
+
+  try {
+    const { password } = req.body ?? {};
+    if (!password || typeof password !== "string") {
+      return res.status(400).json({ error: "Password is required" });
+    }
+
+    if (!verifyAdminPassword(password)) {
+      return res.status(401).json({ error: "Invalid password" });
+    }
+
+    return res.status(200).json({ token: createAdminToken() });
+  } catch (err) {
+    console.error("Admin login error:", err);
+    return res.status(500).json({ error: "Login failed" });
+  }
+}

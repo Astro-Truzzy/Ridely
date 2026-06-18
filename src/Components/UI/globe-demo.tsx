@@ -1,10 +1,9 @@
-"use client";
+import { lazy, Suspense } from "react";
 import { motion } from "motion/react";
-import dynamic from "next/dynamic";
 
-const World = dynamic(() => import("../UI/globe").then((m) => m.World), {
-  ssr: false,
-});
+const World = lazy(() =>
+  import("./globe").then((m) => ({ default: m.World }))
+);
 
 export function GlobeDemo() {
   const globeConfig = {
@@ -394,38 +393,43 @@ export function GlobeDemo() {
   ];
 
   return (
-    <div className="flex flex-row items-center justify-center py-20 h-screen md:h-auto dark:bg-black bg-white relative w-full">
+    <div
+      className="flex flex-row items-center justify-center py-20 h-screen md:h-auto relative w-full"
+      style={{ background: "#0a0a0f" }}
+    >
       <div className="max-w-7xl mx-auto w-full relative overflow-hidden h-full md:h-[40rem] px-4">
         <motion.div
-          initial={{
-            opacity: 0,
-            y: 20,
-          }}
-          animate={{
-            opacity: 1,
-            y: 0,
-          }}
-          transition={{
-            duration: 1,
-          }}
-          className="div"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1 }}
         >
-          <h2 className="text-center text-xl md:text-2xl font-bold text-black dark:text-white">
-            Ridely's Global Vision:{" "}
-            <span className="text-[#157aff]"> Connecting the World</span>{" "}
-            Through <span className="text-[#157aff]"> Smart Deliveries </span>
+          <h2 className="text-center text-2xl md:text-4xl font-extrabold text-white">
+            Ridely's Global Vision
           </h2>
-          <p className="text-center text-base md:text-sm font-normal text-neutral-700 dark:text-neutral-200 max-w-md mt-2 mx-auto">
-            At <span className="text-[#157aff]">Ridely</span>, we're not just
-            delivering parcels — we’re delivering progress. As our globe
-            spins, so does our ambition to scale across borders and connect more
-            people with smarter, faster deliveries. This is just the beginning —
-            ride with us as we go global.
+          <p
+            className="text-center text-base md:text-lg font-normal max-w-xl mt-4 mx-auto leading-relaxed"
+            style={{ color: "#a0a0b0" }}
+          >
+            Born in{" "}
+            <span style={{ color: "#175aff" }}>Benin City</span>, scaling across{" "}
+            <span style={{ color: "#175aff" }}>Nigeria</span> and beyond. Ridely
+            is building the infrastructure for smarter, faster deliveries — one
+            city at a time, connecting communities worldwide.
           </p>
         </motion.div>
-        <div className="absolute w-full bottom-0 inset-x-0 h-40 bg-gradient-to-b pointer-events-none select-none from-transparent dark:to-black to-white z-40" />
-        <div className="absolute w-full -bottom-20 h-72 md:h-full z-10">
-          <World data={sampleArcs} globeConfig={globeConfig} />
+
+        <div
+          className="absolute w-full bottom-0 inset-x-0 h-40 pointer-events-none select-none z-40"
+          style={{
+            background: "linear-gradient(to bottom, transparent, #0a0a0f)",
+          }}
+        />
+        <div className="absolute w-full -bottom-20 h-72 md:h-full z-10 flex items-center justify-center">
+          <div className="relative w-full h-full">
+            <Suspense fallback={null}>
+              <World data={sampleArcs} globeConfig={globeConfig} />
+            </Suspense>
+          </div>
         </div>
       </div>
     </div>

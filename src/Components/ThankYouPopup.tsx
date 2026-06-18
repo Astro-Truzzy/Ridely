@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { CheckCircle } from "lucide-react"; 
+import { CheckCircle } from "lucide-react";
 
 export default function ThankYouPopup({
   show,
@@ -19,9 +19,9 @@ export default function ThankYouPopup({
         setProgress(start);
         if (start >= 100) {
           clearInterval(interval);
-          onClose(); 
+          onClose();
         }
-      }, 50); // 50ms x 100 = 5s
+      }, 50);
 
       return () => clearInterval(interval);
     }
@@ -35,20 +35,26 @@ export default function ThankYouPopup({
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 40 }}
           transition={{ duration: 0.4 }}
-          className="fixed bottom-8 right-8 bg-white border border-gray-200 shadow-xl rounded-lg p-6 flex items-center gap-4 z-50"
+          className="fixed bottom-4 right-4 sm:bottom-8 sm:right-8 left-4 sm:left-auto bg-[#111118] border border-white/[0.08] backdrop-blur-xl shadow-2xl shadow-black/50 rounded-xl p-4 sm:p-6 flex items-center gap-3 sm:gap-4 z-[60] max-w-sm sm:max-w-md"
         >
-          <CheckCircle className="text-green-500 w-6 h-6" />
-          <div>
-            <h4 className="text-lg font-semibold text-gray-800">
-              Thank you for registering with{" "}
-              <span className="text-[#175aff]">Ridely</span> 🎉
+          <CheckCircle className="text-[#4d7dff] w-6 h-6 shrink-0" />
+          <div className="min-w-0">
+            <h4 className="text-base sm:text-lg font-semibold text-white">
+              You&apos;re on the list!
             </h4>
-            <p className="text-sm text-gray-500">You’re being redirected...</p>
+            <p className="text-sm text-[#a0a0b0]">
+              Thanks for joining{" "}
+              <span className="text-[#175aff] font-medium">Ridely</span>.
+              Redirecting you now…
+            </p>
           </div>
-          {/* Circular progress ring */}
-          <svg className="w-10 h-10 ml-auto" viewBox="0 0 36 36">
+          <svg
+            className="w-9 h-9 sm:w-10 sm:h-10 ml-auto shrink-0"
+            viewBox="0 0 36 36"
+            aria-hidden="true"
+          >
             <path
-              className="text-gray-200"
+              className="text-white/[0.08]"
               d="M18 2.0845
                  a 15.9155 15.9155 0 0 1 0 31.831
                  a 15.9155 15.9155 0 0 1 0 -31.831"

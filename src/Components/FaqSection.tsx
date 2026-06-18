@@ -1,6 +1,5 @@
 "use client";
 
-import { FcFaq } from "react-icons/fc";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -18,44 +17,44 @@ const faqs = [
   {
     question: "What kind of packages can I send with Ridely?",
     answer:
-      "Ridely lets you send anything from small envelopes to medium-sized boxes (food, cosmetic products, clothes, vehicle repair parts, and lots more. ). Just no live animals or time-traveling devices, please 🚫🐸🕰️.",
-    icon: <FaBox className="text-blue-600 text-xl" />,
+      "Ridely handles a wide range of items — from documents and small envelopes to medium-sized boxes including food, cosmetics, clothing, and vehicle parts. Prohibited items include live animals, hazardous materials, and illegal goods.",
+    icon: <FaBox className="text-xl" style={{ color: "#175aff" }} />,
   },
   {
     question: "Can I track my delivery in real-time?",
     answer:
-      "Yes! Use our real-time map tracking to watch your package ride from pickup to dropoff📍.",
-    icon: <FaMapMarkedAlt className="text-blue-600 text-xl" />,
+      "Yes. Every delivery includes live GPS tracking so you can follow your package from pickup to drop-off directly in the Ridely app.",
+    icon: <FaMapMarkedAlt className="text-xl" style={{ color: "#175aff" }} />,
   },
   {
     question: "Who delivers my package?",
     answer:
-      "Ridely riders! Trusted, verified, and trained to ride rain or shine ☀️🌧️.",
-    icon: <FaMotorcycle className="text-blue-600 text-xl" />,
+      "Your package is handled by verified Ridely riders — trained professionals committed to safe, reliable, and timely deliveries across the city.",
+    icon: <FaMotorcycle className="text-xl" style={{ color: "#175aff" }} />,
   },
   {
     question: "Is my package insured?",
     answer:
-      "Absolutely. All packages are covered under our standard protection policy 🔐.",
-    icon: <FaUserShield className="text-blue-600 text-xl" />,
+      "Yes. All shipments are covered under our standard protection policy, giving you peace of mind from pickup through delivery.",
+    icon: <FaUserShield className="text-xl" style={{ color: "#175aff" }} />,
   },
   {
     question: "What payment methods do you accept?",
     answer:
-      "We accept cash, cards, mobile payments, and the occasional high-five (just kidding 😄).",
-    icon: <FaCreditCard className="text-blue-600 text-xl" />,
+      "We accept cash, debit and credit cards, and mobile money payments — giving you flexible, secure options for every delivery.",
+    icon: <FaCreditCard className="text-xl" style={{ color: "#175aff" }} />,
   },
   {
     question: "How fast is Ridely?",
     answer:
-      "Super fast! Most intra-city deliveries are done in under 30 minutes 🚀.",
-    icon: <FaClock className="text-blue-600 text-xl" />,
+      "Most intra-city deliveries are completed within 30 minutes, depending on distance and traffic conditions in your area.",
+    icon: <FaClock className="text-xl" style={{ color: "#175aff" }} />,
   },
   {
     question: "Why choose Ridely?",
     answer:
-      "Ridely combines smart technology, real-time tracking, and reliable riders to deliver packages swiftly and securely. Whether you're a business or individual, our platform ensures convenience, transparency, and peace of mind — every step of the way.📬",
-    icon: <FaSmile className="text-blue-600 text-xl" />,
+      "Ridely combines smart technology, real-time tracking, and verified riders to deliver packages swiftly and securely. Whether you're a business or an individual, our platform offers convenience, transparency, and reliability at every step.",
+    icon: <FaSmile className="text-xl" style={{ color: "#175aff" }} />,
   },
 ];
 
@@ -67,30 +66,49 @@ export default function FaqSection() {
   };
 
   return (
-    <div className="w-full bg-gray-50 py-16 px-4">
-      <section className="max-w-5xl mx-auto" id="FAQs">
-        <h2 className="text-4xl font-bold text-center mb-10 text-neutral-800">
-          <FcFaq className="inline-block mr-2" />
+    <div
+      className="w-full py-20 px-4 md:px-8"
+      style={{ background: "#111118" }}
+    >
+      <section className="max-w-3xl mx-auto" id="FAQs">
+        <h2 className="text-3xl md:text-5xl font-extrabold text-center mb-4 text-white">
           Frequently Asked Questions
         </h2>
-        <div className="space-y-6">
+        <p
+          className="text-center mb-12 text-lg"
+          style={{ color: "#a0a0b0" }}
+        >
+          Everything you need to know about Ridely deliveries.
+        </p>
+
+        <div className="space-y-4">
           {faqs.map((faq, index) => (
             <div
               key={index}
-              className="border border-gray-200 rounded-lg shadow-md transition-all duration-300 bg-white"
+              className="rounded-xl overflow-hidden transition-all duration-300"
+              style={{
+                background: "rgba(255,255,255,0.04)",
+                border: "1px solid rgba(255,255,255,0.08)",
+                backdropFilter: "blur(8px)",
+              }}
             >
               <button
                 onClick={() => toggleFAQ(index)}
-                className="w-full flex items-center justify-between p-4 text-left"
+                className="w-full flex items-center justify-between p-5 text-left gap-4"
               >
-                <div className="flex gap-3 items-center text-gray-800 font-semibold text-lg">
-                  {faq.icon} {faq.question}
+                <div className="flex gap-3 items-center text-white font-semibold text-base md:text-lg">
+                  {faq.icon}
+                  <span>{faq.question}</span>
                 </div>
                 <motion.div
                   animate={{ rotate: openIndex === index ? 180 : 0 }}
                   transition={{ type: "spring", stiffness: 200 }}
+                  className="flex-shrink-0"
                 >
-                  <IoIosArrowDown className="text-2xl text-gray-500" />
+                  <IoIosArrowDown
+                    className="text-2xl"
+                    style={{ color: "#175aff" }}
+                  />
                 </motion.div>
               </button>
               <AnimatePresence initial={false}>
@@ -99,8 +117,9 @@ export default function FaqSection() {
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: "auto" }}
                     exit={{ opacity: 0, height: 0 }}
-                    transition={{ duration: 0.2 }}
-                    className="px-4 pb-4 text-gray-600"
+                    transition={{ duration: 0.25 }}
+                    className="px-5 pb-5 leading-relaxed"
+                    style={{ color: "#a0a0b0" }}
                   >
                     {faq.answer}
                   </motion.div>

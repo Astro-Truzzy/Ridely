@@ -92,10 +92,6 @@ const BlogDetail: React.FC = () => {
 const postId = parseInt(id || "", 10);
 const post = blogDetails.find((p) => String(p.id) === id);
 
-console.log("Blog ID from URL:", id);
-
-
-
 const [comments, setComments] = useState<{ name: string; comment: string }[]>(
   []
 );
@@ -117,16 +113,20 @@ useEffect(() => {
 
 if (!post) {
   return (
-    <div className="p-10 text-center">
+    <div
+      className="p-10 text-center min-h-[60vh] flex flex-col items-center justify-center"
+      style={{ background: "#0a0a0f", color: "#ffffff" }}
+    >
       <h2 className="text-2xl font-bold mb-4">Post Not Found</h2>
-      <p className="mb-6">
+      <p className="mb-6" style={{ color: "#a0a0b0" }}>
         Sorry, the blog post you are looking for does not exist.
       </p>
       <button
-        onClick={() => navigate("/blog")}
-        className="px-6 py-3 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+        type="button"
+        onClick={() => navigate("/")}
+        className="gradient-blue px-6 py-3 rounded-full font-semibold"
       >
-        Back to Blog
+        Back to Home
       </button>
     </div>
   );
@@ -134,8 +134,14 @@ if (!post) {
 
 if (loading) {
   return (
-    <div className="flex items-center justify-center h-[60vh]">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-blue-600 border-opacity-50" />
+    <div
+      className="flex items-center justify-center h-[60vh]"
+      style={{ background: "#0a0a0f" }}
+    >
+      <div
+        className="animate-spin rounded-full h-12 w-12 border-t-4 border-opacity-50"
+        style={{ borderColor: "#175aff", borderTopColor: "transparent" }}
+      />
     </div>
   );
 }
@@ -171,9 +177,10 @@ const handleCommentSubmit = (e: React.FormEvent) => {
         />
         <meta property="og:url" content={currentUrl} />
       </Helmet>
-      ;
+      <div style={{ background: "#0a0a0f" }} className="min-h-screen py-10 px-4">
       <motion.section
-        className="max-w-4xl mx-auto p-6 md:p-12 bg-white rounded-lg shadow-lg my-10"
+        className="max-w-4xl mx-auto p-6 md:p-10 glass-card rounded-2xl my-6"
+        style={{ border: "1px solid rgba(255,255,255,0.08)" }}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
@@ -181,25 +188,32 @@ const handleCommentSubmit = (e: React.FormEvent) => {
         <img
           src={post.image}
           alt={post.title}
-          className="w-full h-64 md:h-96 object-cover rounded-md mb-8"
+          className="w-full h-64 md:h-96 object-cover rounded-xl mb-8"
         />
-        <h1 className="text-3xl md:text-4xl font-bold text-[#175aff] mb-4">
+        <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">
           {post.title}
         </h1>
-        <div className="text-sm text-gray-500 mb-6 flex flex-col md:flex-row md:justify-between">
+        <div
+          className="text-sm mb-8 flex flex-col md:flex-row md:justify-between gap-1"
+          style={{ color: "#a0a0b0" }}
+        >
           <span>By {post.author}</span>
           <span>{post.date}</span>
         </div>
-        <article className="text-gray-800 whitespace-pre-line leading-relaxed mb-10 text-base md:text-lg">
+        <article
+          className="whitespace-pre-line leading-relaxed mb-10 text-base md:text-lg"
+          style={{ color: "#d0d0dc" }}
+        >
           {post.content}
         </article>
 
         {/* Pagination - Next/Previous */}
-        <div className="flex justify-between mt-10">
+        <div className="flex justify-between mt-10 pt-6" style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}>
           {postId > 1 && (
             <Link
               to={`/blog/${postId - 1}`}
-              className="text-blue-600 hover:underline"
+              className="font-medium transition-colors hover:text-[#4d7dff]"
+              style={{ color: "#175aff" }}
             >
               ← Previous Post
             </Link>
@@ -207,7 +221,8 @@ const handleCommentSubmit = (e: React.FormEvent) => {
           {postId < blogDetails.length && (
             <Link
               to={`/blog/${postId + 1}`}
-              className="text-blue-600 hover:underline ml-auto"
+              className="font-medium ml-auto transition-colors hover:text-[#4d7dff]"
+              style={{ color: "#175aff" }}
             >
               Next Post →
             </Link>
@@ -215,16 +230,17 @@ const handleCommentSubmit = (e: React.FormEvent) => {
         </div>
 
         {/* Social Sharing */}
-        <div className="mb-10 mt-6">
-          <h3 className="text-lg font-semibold mb-3">Share this article:</h3>
-          <div className="flex space-x-4">
+        <div className="mb-10 mt-8 pt-8" style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}>
+          <h3 className="text-lg font-semibold mb-4 text-white">Share this article</h3>
+          <div className="flex flex-wrap gap-4">
             <a
               href={createShareUrl("twitter", currentUrl, post.title)}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-blue-500 hover:text-blue-700 transition flex items-center space-x-2"
+              className="transition flex items-center gap-2 hover:text-white"
+              style={{ color: "#a0a0b0" }}
             >
-              <FaXTwitter className="text-2xl" />
+              <FaXTwitter className="text-xl" />
               <span>X (Twitter)</span>
             </a>
 
@@ -232,9 +248,10 @@ const handleCommentSubmit = (e: React.FormEvent) => {
               href={createShareUrl("linkedin", currentUrl, post.title)}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-blue-700 hover:text-blue-900 transition flex items-center space-x-2"
+              className="transition flex items-center gap-2 hover:text-white"
+              style={{ color: "#a0a0b0" }}
             >
-              <FaLinkedin className="text-2xl" />
+              <FaLinkedin className="text-xl" />
               <span>LinkedIn</span>
             </a>
 
@@ -242,23 +259,29 @@ const handleCommentSubmit = (e: React.FormEvent) => {
               href={createShareUrl("facebook", currentUrl, post.title)}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-blue-800 hover:text-blue-900 transition flex items-center space-x-2"
+              className="transition flex items-center gap-2 hover:text-white"
+              style={{ color: "#a0a0b0" }}
             >
-              <FaFacebookSquare className="text-2xl" />
+              <FaFacebookSquare className="text-xl" />
               <span>Facebook</span>
             </a>
           </div>
         </div>
 
         {/* Comments */}
-        <section className="mb-10">
-          <h3 className="text-xl font-semibold mb-4">Comments</h3>
+        <section className="mb-10 pt-8" style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}>
+          <h3 className="text-xl font-semibold mb-4 text-white">Comments</h3>
 
           <form onSubmit={handleCommentSubmit} className="mb-6 space-y-3">
             <input
               type="text"
               placeholder="Your Name"
-              className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="w-full rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#175aff]"
+              style={{
+                background: "#1a1a2e",
+                border: "1px solid rgba(255,255,255,0.1)",
+                color: "#ffffff",
+              }}
               value={commentInput.name}
               onChange={(e) =>
                 setCommentInput({ ...commentInput, name: e.target.value })
@@ -267,7 +290,12 @@ const handleCommentSubmit = (e: React.FormEvent) => {
             />
             <textarea
               placeholder="Your Comment"
-              className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="w-full rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#175aff]"
+              style={{
+                background: "#1a1a2e",
+                border: "1px solid rgba(255,255,255,0.1)",
+                color: "#ffffff",
+              }}
               rows={3}
               value={commentInput.comment}
               onChange={(e) =>
@@ -277,7 +305,7 @@ const handleCommentSubmit = (e: React.FormEvent) => {
             />
             <button
               type="submit"
-              className="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700 transition"
+              className="gradient-blue px-5 py-2.5 rounded-full font-semibold"
             >
               Submit Comment
             </button>
@@ -285,14 +313,18 @@ const handleCommentSubmit = (e: React.FormEvent) => {
 
           <div>
             {comments.length === 0 ? (
-              <p className="text-gray-500">
+              <p style={{ color: "#a0a0b0" }}>
                 No comments yet. Be the first to comment!
               </p>
             ) : (
               comments.map((c, i) => (
-                <div key={i} className="mb-4 border-b border-gray-200 pb-3">
-                  <p className="font-semibold">{c.name}</p>
-                  <p className="text-gray-700 whitespace-pre-line">
+                <div
+                  key={i}
+                  className="mb-4 pb-4"
+                  style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}
+                >
+                  <p className="font-semibold text-white">{c.name}</p>
+                  <p className="whitespace-pre-line mt-1" style={{ color: "#a0a0b0" }}>
                     {c.comment}
                   </p>
                 </div>
@@ -303,36 +335,39 @@ const handleCommentSubmit = (e: React.FormEvent) => {
 
         {/* Related Posts */}
         {relatedPosts.length > 0 && (
-          <section className="mb-10">
-            <div className="mt-14">
-              <h3 className="text-2xl font-semibold mb-6">Related Posts</h3>
-              <div className="grid md:grid-cols-2 gap-6">
-                {relatedPosts.map((related) => (
-                  <motion.div
-                    key={related.id}
-                    whileHover={{ scale: 1.03 }}
-                    className="bg-gray-50 rounded-lg shadow p-4"
-                  >
-                    <Link to={`/blog/${related.id}`}>
-                      <img
-                        src={related.image}
-                        alt={related.title}
-                        className="rounded-md mb-3 h-40 object-cover w-full"
-                      />
-                      <h4 className="text-xl font-bold text-[#175aff]">
-                        {related.title}
-                      </h4>
-                      <p className="text-gray-600 text-sm mt-1">
+          <section className="mb-6 pt-8" style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}>
+            <h3 className="text-2xl font-semibold mb-6 text-white">Related Posts</h3>
+            <div className="grid md:grid-cols-2 gap-6">
+              {relatedPosts.map((related) => (
+                <motion.div
+                  key={related.id}
+                  whileHover={{ scale: 1.02 }}
+                  className="rounded-xl overflow-hidden transition-all duration-300"
+                  style={{
+                    background: "rgba(255,255,255,0.04)",
+                    border: "1px solid rgba(255,255,255,0.08)",
+                  }}
+                >
+                  <Link to={`/blog/${related.id}`}>
+                    <img
+                      src={related.image}
+                      alt={related.title}
+                      className="mb-0 h-40 object-cover w-full"
+                    />
+                    <div className="p-4">
+                      <h4 className="text-lg font-bold text-white">{related.title}</h4>
+                      <p className="text-sm mt-1" style={{ color: "#a0a0b0" }}>
                         {related.date}
                       </p>
-                    </Link>
-                  </motion.div>
-                ))}
-              </div>
+                    </div>
+                  </Link>
+                </motion.div>
+              ))}
             </div>
           </section>
         )}
       </motion.section>
+      </div>
     </>
   );
 };

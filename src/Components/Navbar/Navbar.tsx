@@ -1,207 +1,113 @@
-import { useState } from "react";
-import { FaCaretDown } from "react-icons/fa";
+import { useState, useEffect } from "react";
 import { HiOutlineMenu, HiX } from "react-icons/hi";
-import { MdHome, MdInfoOutline, MdArticle, MdOutlineConnectWithoutContact } from "react-icons/md";
-import { FaClipboardList } from "react-icons/fa6";
-import { FcFaq } from "react-icons/fc";
-import { FaTimeline } from "react-icons/fa6";
-import blacklogo from "../../assets/Images/black_logo-removebg-preview.png";
 import useScrollDirection from "../../hooks/useScrollDirection";
-const MenuLinks = [
-  {
-    id: 1,
-    name: "Home",
-    link: "#Home",
-    icon: MdHome,
-  },
-  {
-    id: 2,
-    name: "Services",
-    link: "#Services",
-    icon: MdInfoOutline,
-  },
-  {
-    id: 3,
-    name: "Blogs",
-    link: "#Blogs",
-    icon: MdArticle,
-  },
-  {
-    id: 4,
-    name: "Contact",
-    link: "#Contact",
-    icon: MdOutlineConnectWithoutContact,
-  },
-];
-
-const DropdownLinks = [
-  {
-    id: 1,
-    name: "Timeline",
-    link: "#Timeline",
-    icon: FaTimeline,
-  },
-  {
-    id: 2,
-    name: "Waitlist",
-    link: "#Waitlist",
-    icon: FaClipboardList,
-  },
-  {
-    id: 3,
-    name: "FAQs",
-    link: "#FAQs",
-    icon: FcFaq,
-  },
-];
+import MegaMenu from "./MegaMenu";
+import ridelyLogo from "../../assets/brand";
 
 const Navbar = () => {
   const showNavbar = useScrollDirection();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen);
-  };
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 20);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const toggleMenu = () => setMenuOpen((prev) => !prev);
+  const closeMenu = () => setMenuOpen(false);
 
   return (
-    <div
-      className={`fixed top-0 left-0 w-full bg-white z-50 shadow-md transition-transform duration-300 ease-in-out transform ${
-        showNavbar || sidebarOpen ? "" : "-translate-y-full"
-      }`}
-    >
-      <div className="py-4">
-        <div className="container flex items-center justify-between">
-          {/* Logo Section */}
-          <div className="flex items-center px-3">
-            <div className="h-16 w-38 flex items-center justify-center object-contain">
-              <a href="#" className="block">
-                <img
-                  src={blacklogo}
-                  alt="Ridely Logo"
-                  className="w-[350px] logo"
-                />
-              </a>
-            </div>
-          </div>
+    <>
+      <header
+        className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ease-in-out transform ${
+          showNavbar || menuOpen ? "translate-y-0" : "-translate-y-full"
+        }`}
+        style={{
+          background: menuOpen
+            ? "transparent"
+            : scrolled
+              ? "rgba(10, 10, 15, 0.85)"
+              : "transparent",
+          backdropFilter: menuOpen ? "none" : scrolled ? "blur(20px)" : "none",
+          WebkitBackdropFilter: menuOpen
+            ? "none"
+            : scrolled
+              ? "blur(20px)"
+              : "none",
+          borderBottom: menuOpen
+            ? "1px solid transparent"
+            : scrolled
+              ? "1px solid rgba(255,255,255,0.08)"
+              : "1px solid transparent",
+        }}
+      >
+        <div className="container flex items-center justify-between py-3 sm:py-4 lg:py-5 px-4 lg:px-8">
+          {/* Logo */}
+          <a href="#Home" className="flex items-center shrink-0">
+            <img
+              src={ridelyLogo}
+              alt="Ridely"
+              className="h-7 sm:h-8 lg:h-10 w-auto"
+            />
+          </a>
 
-          {/* Menu Links (Desktop) */}
-          <div className="hidden lg:flex items-center">
-            <ul className="flex items-center gap-4">
-              {MenuLinks.map((data) => {
-                const Icon = data.icon;
-                return (
-                  <li key={data.id}>
-                    <a
-                      href={data.link}
-                      className="inline-flex items-center gap-1 px-4 font-semibold text-black hover:text-[#157aff] duration-200"
-                    >
-                      <Icon className="text-xl" />
-                      {data.name}
-                    </a>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-
-          {/* Quick Links Dropdown (Desktop) */}
-          <div className="hidden lg:flex items-center px-3">
-            <div className="relative group">
-              <a
-                href="#"
-                className="flex items-center gap-2 font-semibold text-black py-2 hover:text-gray-500"
-              >
-                Quick Links
-                <FaCaretDown className="group-hover:rotate-180 duration-300" />
-              </a>
-              <div className="absolute right-0 z-[9999] hidden group-hover:block w-[200px] rounded-md bg-white shadow-md p-2 text-[#175AFF]">
-                <ul className="space-y-2">
-                  {DropdownLinks.map((data) => (
-                    <li key={data.id}>
-                      <a
-                        className="flex items-center gap-2 w-full p-2 rounded-md font-semibold hover:bg-[#175AFF]/10 hover:text-[#175AFF] duration-200"
-                        href={data.link}
-                      >
-                        {data.icon && <data.icon className="text-xl" />}
-                        {data.name}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </div>
-
-          {/* Mobile Menu Button */}
-          <div className="block lg:hidden px-3">
+          {/* Desktop nav */}
+          <nav className="hidden lg:flex items-center gap-3">
             <button
-              onClick={toggleSidebar}
-              className="p-2"
-              aria-label="Toggle Menu"
+              type="button"
+              onClick={toggleMenu}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium text-[#a0a0b0] hover:text-white hover:bg-white/5 transition-colors"
+              aria-expanded={menuOpen}
+              aria-label="Open menu"
             >
-              {sidebarOpen ? (
-                <HiX className="w-6 h-6 text-black" />
+              <HiOutlineMenu className="w-5 h-5" />
+              Menu
+            </button>
+
+            <a
+              href="#Contact"
+              className="px-4 py-2 text-sm font-medium text-[#a0a0b0] hover:text-white transition-colors duration-200"
+            >
+              Support
+            </a>
+
+            <a
+              href="#Waitlist"
+              className="gradient-blue ml-1 px-5 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap"
+            >
+              Join Waitlist →
+            </a>
+          </nav>
+
+          {/* Mobile: CTA + menu */}
+          <div className="flex items-center gap-3 lg:hidden">
+            <a
+              href="#Waitlist"
+              className="gradient-blue px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap"
+            >
+              Join Waitlist
+            </a>
+            <button
+              onClick={toggleMenu}
+              className="p-2 text-white"
+              aria-label="Toggle menu"
+              aria-expanded={menuOpen}
+            >
+              {menuOpen ? (
+                <HiX className="w-6 h-6" />
               ) : (
-                <HiOutlineMenu className="w-6 h-6 text-black" />
+                <HiOutlineMenu className="w-6 h-6" />
               )}
             </button>
           </div>
         </div>
-      </div>
+      </header>
 
-      {/* Sidebar (Mobile) */}
-      {sidebarOpen && (
-        <div className="fixed inset-0 z-50">
-          <div
-            className="absolute inset-0 bg-black opacity-50"
-            onClick={toggleSidebar}
-          ></div>
-          <div className="absolute left-0 top-0 h-full w-64 bg-[#175AFF] shadow-lg p-6 transform transition-transform ease-out duration-500">
-            <button
-              onClick={toggleSidebar}
-              className="mb-4"
-              aria-label="Close Sidebar"
-            >
-              <HiX className="w-6 h-6 text-white" />
-            </button>
-            <ul>
-              {MenuLinks.map((data) => {
-                const Icon = data.icon;
-                return (
-                  <li key={data.id} className="mb-4">
-                    <a
-                      href={data.link}
-                      className="flex items-center gap-2 px-4 py-2 font-semibold text-white hover:text-gray-300 duration-200"
-                      onClick={toggleSidebar}
-                    >
-                      <Icon className="text-xl" />
-                      {data.name}
-                    </a>
-                  </li>
-                );
-              })}
-              <li className="mt-4">
-                <div className="font-semibold text-white mb-2">Quick Links</div>
-                <ul className="ml-4">
-                  {DropdownLinks.map((data) => (
-                    <li key={data.id} className="mb-2">
-                      <a
-                        href={data.link}
-                        className="flex items-center gap-2 px-4 py-2 font-semibold text-white hover:text-gray-300 duration-200"
-                        onClick={toggleSidebar}
-                      >
-                        {data.icon && <data.icon className="text-xl" />}
-                        {data.name}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </li>
-            </ul>
-          </div>
-        </div>
-      )}
-    </div>
+      <MegaMenu isOpen={menuOpen} onClose={closeMenu} />
+    </>
   );
 };
 
