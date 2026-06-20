@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { getBearerToken, verifyAdminToken } from "../_lib/auth";
-import { corsHeaders } from "../_lib/cors";
-import { getSupabase } from "../_lib/supabase";
+import { getBearerToken, verifyAdminToken } from "../_lib/auth.js";
+import { corsHeaders } from "../_lib/cors.js";
+import { getSupabase } from "../_lib/supabase.js";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const headers = corsHeaders(req.headers.origin, "GET, OPTIONS");

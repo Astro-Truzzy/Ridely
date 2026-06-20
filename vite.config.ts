@@ -8,6 +8,15 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
+  server: {
+    proxy: {
+      '/api': {
+        target: 'https://www.ridelyweb.com',
+        changeOrigin: true,
+        secure: true,
+      },
+    },
+  },
   build: {
     target: 'es2020',
     cssCodeSplit: true,

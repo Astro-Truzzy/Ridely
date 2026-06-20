@@ -27,3 +27,5 @@ src/assets/videos/hero-bg-4k.mp4
 *.njsproj
 *.sln
 *.sw?
+
+.vercel

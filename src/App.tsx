@@ -54,7 +54,7 @@ function MarketingSite() {
           name="description"
           content="Ridely helps you send and receive parcels easily with real-time rider tracking, affordable rates, and low-risk delivery."
         />
-        <link rel="canonical" href="https://www.ridelyapp.vercel.app/" />
+        <link rel="canonical" href="https://www.ridelyweb.com/" />
       </Helmet>
       <Navbar />
       <ScrollToTop />

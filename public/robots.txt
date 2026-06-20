@@ -9,4 +9,4 @@ Disallow: /api/
 Allow: /
 
 # Sitemap location
-Sitemap: https://www.ridelyapp.vercel.app/sitemap.xml
+Sitemap: https://www.ridelyweb.com/sitemap.xml

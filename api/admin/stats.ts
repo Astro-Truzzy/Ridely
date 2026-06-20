@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { getBearerToken, verifyAdminToken } from "../_lib/auth";
-import { corsHeaders } from "../_lib/cors";
-import { getSupabase } from "../_lib/supabase";
+import { getBearerToken, verifyAdminToken } from "../_lib/auth.js";
+import { corsHeaders } from "../_lib/cors.js";
+import { getSupabase } from "../_lib/supabase.js";
 
 function startOfDay(d = new Date()) {
   const date = new Date(d);

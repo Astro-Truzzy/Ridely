@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { createAdminToken, verifyAdminPassword } from "../_lib/auth";
-import { corsHeaders } from "../_lib/cors";
+import { createAdminToken, verifyAdminPassword } from "../_lib/auth.js";
+import { corsHeaders } from "../_lib/cors.js";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const headers = corsHeaders(req.headers.origin, "POST, OPTIONS");
