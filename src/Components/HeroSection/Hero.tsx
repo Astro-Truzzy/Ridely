@@ -68,7 +68,6 @@ const HeroData: HeroItem[] = [
 ];
 
 const STAT_CHIPS = [
-  { label: "1,200+ Deliveries" },
   { label: "4.9★ Rating" },
   { label: "32% Savings" },
 ];
