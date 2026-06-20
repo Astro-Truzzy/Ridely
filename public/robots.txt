@@ -1,12 +1,7 @@
-# Allow all search engines
 User-agent: *
-Disallow: /admin/
-Disallow: /rider-dashboard/
-Disallow: /checkout/
-Disallow: /login/
-Disallow: /register/
-Disallow: /api/
 Allow: /
 
-# Sitemap location
+Disallow: /admin
+Disallow: /api/
+
 Sitemap: https://www.ridelyweb.com/sitemap.xml

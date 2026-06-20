@@ -3,6 +3,7 @@ import React, { useState,useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Helmet } from "react-helmet";
+import { SITE_URL } from "../Lib/site";
 import { FaXTwitter } from "react-icons/fa6";
 import { FaLinkedin } from "react-icons/fa";
 import { FaFacebookSquare } from "react-icons/fa";
@@ -175,7 +176,8 @@ const handleCommentSubmit = (e: React.FormEvent) => {
           property="og:image"
           content={window.location.origin + post.image}
         />
-        <meta property="og:url" content={currentUrl} />
+        <link rel="canonical" href={`${SITE_URL}/blog/${post.id}`} />
+        <meta property="og:url" content={`${SITE_URL}/blog/${post.id}`} />
       </Helmet>
       <div style={{ background: "#0a0a0f" }} className="min-h-screen py-10 px-4">
       <motion.section

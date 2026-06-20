@@ -9,6 +9,7 @@ import WaitlistModal from "./Components/WaitlistModal";
 import Footer from "./Components/Footer";
 import ScrollToTop from "./Components/MoveToTop/ScrollToTop";
 import { Helmet } from "react-helmet";
+import { SITE_URL } from "./Lib/site";
 import CookieNotice from "./Components/CookieNotice";
 import StickySignupBar from "./Components/StickySignupBar";
 import LazyMount from "./Components/LazyMount";
@@ -54,7 +55,7 @@ function MarketingSite() {
           name="description"
           content="Ridely helps you send and receive parcels easily with real-time rider tracking, affordable rates, and low-risk delivery."
         />
-        <link rel="canonical" href="https://www.ridelyweb.com/" />
+        <link rel="canonical" href={`${SITE_URL}/`} />
       </Helmet>
       <Navbar />
       <ScrollToTop />

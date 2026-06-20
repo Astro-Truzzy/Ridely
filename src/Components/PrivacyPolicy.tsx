@@ -1,7 +1,9 @@
 import React, { useEffect } from "react";
+import { Helmet } from "react-helmet";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import PrivacyPolicyPDF from "./PrivacyPolicyPDF";
 import toast, { Toaster } from "react-hot-toast";
+import { SITE_URL } from "../Lib/site";
 
 const PrivacyPolicy: React.FC = () => {
 
@@ -15,6 +17,14 @@ const PrivacyPolicy: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-white text-gray-800 px-6 py-12 animate-fade-in">
+      <Helmet>
+        <title>Privacy Policy | Ridely</title>
+        <meta
+          name="description"
+          content="Read Ridely's privacy policy to learn how we collect, use, and protect your personal information."
+        />
+        <link rel="canonical" href={`${SITE_URL}/privacy-policy`} />
+      </Helmet>
       <Toaster position="top-right" />
 
       <div className="max-w-4xl mx-auto">
