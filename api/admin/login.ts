@@ -1,18 +1,15 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { createAdminToken, verifyAdminPassword } from "../_lib/auth.js";
-import { corsHeaders } from "../_lib/cors.js";
+import { applyCors, corsHeaders, handleCorsOptions } from "../_lib/cors.js";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const headers = corsHeaders(req.headers.origin, "POST, OPTIONS");
 
   if (req.method === "OPTIONS") {
-    return res
-      .status(204)
-      .setHeader("Access-Control-Allow-Origin", headers["Access-Control-Allow-Origin"])
-      .end();
+    return handleCorsOptions(res, headers);
   }
 
-  Object.entries(headers).forEach(([key, value]) => res.setHeader(key, value));
+  applyCors(res, headers);
 
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });

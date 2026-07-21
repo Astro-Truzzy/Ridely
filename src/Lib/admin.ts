@@ -15,14 +15,21 @@ export function clearAdminToken() {
 
 async function adminFetch<T>(path: string, init?: RequestInit): Promise<T> {
   const token = getAdminToken();
-  const response = await fetch(`${API_BASE}${path}`, {
-    ...init,
-    headers: {
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...init?.headers,
-    },
-  });
+  let response: Response;
+  try {
+    response = await fetch(`${API_BASE}${path}`, {
+      ...init,
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...init?.headers,
+      },
+    });
+  } catch {
+    throw new Error(
+      "Cannot reach the API. If you're on localhost, run the Vite dev server (npm run dev) so /api is proxied, and confirm ADMIN_PASSWORD is set on Vercel.",
+    );
+  }
 
   const body = await response.json().catch(() => ({}));
 

@@ -1,6 +1,7 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { createClient } from "@supabase/supabase-js";
 import { Resend } from "resend";
+import { applyCors, corsHeaders, handleCorsOptions } from "./_lib/cors.js";
 
 type WaitlistRole = "customer" | "rider";
 
@@ -20,20 +21,6 @@ function getEnv(name: string): string {
   const value = process.env[name];
   if (!value) throw new Error(`Missing environment variable: ${name}`);
   return value;
-}
-
-function corsHeaders(origin: string | undefined) {
-  const allowed = process.env.ALLOWED_ORIGIN ?? "*";
-  const allowOrigin =
-    allowed === "*" || (origin && allowed.split(",").includes(origin))
-      ? origin ?? "*"
-      : allowed.split(",")[0];
-
-  return {
-    "Access-Control-Allow-Origin": allowOrigin,
-    "Access-Control-Allow-Methods": "POST, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type",
-  };
 }
 
 function validatePayload(body: unknown): { data?: WaitlistPayload; error?: string } {
@@ -121,13 +108,13 @@ function buildAdminEmailHtml(payload: WaitlistPayload) {
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  const headers = corsHeaders(req.headers.origin);
+  const headers = corsHeaders(req.headers.origin, "POST, OPTIONS");
 
   if (req.method === "OPTIONS") {
-    return res.status(204).setHeader("Access-Control-Allow-Origin", headers["Access-Control-Allow-Origin"]).end();
+    return handleCorsOptions(res, headers);
   }
 
-  Object.entries(headers).forEach(([key, value]) => res.setHeader(key, value));
+  applyCors(res, headers);
 
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });

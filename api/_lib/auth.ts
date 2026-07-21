@@ -1,4 +1,4 @@
-import crypto from "crypto";
+import { createHmac } from "crypto";
 import type { VercelRequest } from "@vercel/node";
 
 const TOKEN_TTL_MS = 24 * 60 * 60 * 1000;
@@ -12,8 +12,7 @@ function getAdminSecret(): string {
 export function createAdminToken(): string {
   const payload = { exp: Date.now() + TOKEN_TTL_MS };
   const data = Buffer.from(JSON.stringify(payload)).toString("base64url");
-  const sig = crypto
-    .createHmac("sha256", getAdminSecret())
+  const sig = createHmac("sha256", getAdminSecret())
     .update(data)
     .digest("base64url");
   return `${data}.${sig}`;
@@ -24,8 +23,7 @@ export function verifyAdminToken(token: string | undefined): boolean {
   const [data, sig] = token.split(".");
   if (!data || !sig) return false;
 
-  const expected = crypto
-    .createHmac("sha256", getAdminSecret())
+  const expected = createHmac("sha256", getAdminSecret())
     .update(data)
     .digest("base64url");
   if (sig !== expected) return false;
