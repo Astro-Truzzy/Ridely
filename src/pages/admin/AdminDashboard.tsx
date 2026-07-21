@@ -3,9 +3,12 @@ import { useNavigate } from "react-router-dom";
 import {
   clearAdminToken,
   fetchDashboardStats,
+  fetchPendingRiderVerifications,
   fetchWaitlistSignups,
   getAdminToken,
+  reviewRiderVerification,
   type DashboardStats,
+  type RiderVerificationApplication,
   type WaitlistSignup,
 } from "../../Lib/admin";
 import ridelyLogo from "../../assets/brand";
@@ -53,6 +56,11 @@ export default function AdminDashboard() {
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [applications, setApplications] = useState<
+    RiderVerificationApplication[]
+  >([]);
+  const [reviewingId, setReviewingId] = useState<string | null>(null);
+  const [rejectNotes, setRejectNotes] = useState<Record<string, string>>({});
 
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedSearch(search), 300);
@@ -63,13 +71,18 @@ export default function AdminDashboard() {
     setLoading(true);
     setError("");
     try {
-      const [statsData, waitlistData] = await Promise.all([
+      const [statsData, waitlistData, verificationData] = await Promise.all([
         fetchDashboardStats(),
-        fetchWaitlistSignups({ role: roleFilter || undefined, search: debouncedSearch }),
+        fetchWaitlistSignups({
+          role: roleFilter || undefined,
+          search: debouncedSearch,
+        }),
+        fetchPendingRiderVerifications(),
       ]);
       setStats(statsData);
       setSignups(waitlistData.signups);
       setTotalSignups(waitlistData.total);
+      setApplications(verificationData.applications);
     } catch (err) {
       if (err instanceof Error && err.message === "Unauthorized") {
         clearAdminToken();
@@ -81,6 +94,31 @@ export default function AdminDashboard() {
       setLoading(false);
     }
   }, [navigate, roleFilter, debouncedSearch]);
+
+  const handleReview = async (
+    riderId: string,
+    action: "approve" | "reject",
+  ) => {
+    setReviewingId(riderId);
+    setError("");
+    try {
+      await reviewRiderVerification({
+        action,
+        rider_id: riderId,
+        admin_notes: action === "reject" ? rejectNotes[riderId] : undefined,
+      });
+      setApplications((prev) => prev.filter((a) => a.id !== riderId));
+    } catch (err) {
+      if (err instanceof Error && err.message === "Unauthorized") {
+        clearAdminToken();
+        navigate("/admin/login", { replace: true });
+        return;
+      }
+      setError(err instanceof Error ? err.message : "Review failed");
+    } finally {
+      setReviewingId(null);
+    }
+  };
 
   useEffect(() => {
     if (!getAdminToken()) {
@@ -201,6 +239,108 @@ export default function AdminDashboard() {
             </section>
           </>
         )}
+
+        <section>
+          <h2 className="text-lg font-semibold text-white mb-4">
+            Rider verification
+            <span className="text-[#a0a0b0] text-sm font-normal ml-2">
+              ({applications.length} pending)
+            </span>
+          </h2>
+          <div className="space-y-4">
+            {applications.length === 0 ? (
+              <div className="glass-card rounded-xl px-4 py-8 text-center text-[#a0a0b0] text-sm">
+                No pending rider applications
+              </div>
+            ) : (
+              applications.map((app) => (
+                <div
+                  key={app.id}
+                  className="glass-card rounded-xl p-5 space-y-4"
+                >
+                  <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+                    <div>
+                      <p className="text-white font-medium">{app.full_name}</p>
+                      <p className="text-sm text-[#a0a0b0]">
+                        {app.email}
+                        {app.phone ? ` · ${app.phone}` : ""}
+                      </p>
+                      <p className="text-xs text-[#a0a0b0] mt-1">
+                        {app.vehicle_type ?? "Vehicle n/a"}
+                        {app.plate_number ? ` · ${app.plate_number}` : ""}
+                        {" · "}
+                        Updated {formatDate(app.updated_at)}
+                      </p>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      <button
+                        type="button"
+                        disabled={reviewingId === app.id}
+                        onClick={() => handleReview(app.id, "approve")}
+                        className="px-3 py-1.5 rounded-lg text-sm font-medium bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30 disabled:opacity-50"
+                      >
+                        {reviewingId === app.id ? "…" : "Approve"}
+                      </button>
+                      <button
+                        type="button"
+                        disabled={reviewingId === app.id}
+                        onClick={() => handleReview(app.id, "reject")}
+                        className="px-3 py-1.5 rounded-lg text-sm font-medium bg-red-500/20 text-red-300 hover:bg-red-500/30 disabled:opacity-50"
+                      >
+                        Reject
+                      </button>
+                    </div>
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="Optional reject notes…"
+                    value={rejectNotes[app.id] ?? ""}
+                    onChange={(e) =>
+                      setRejectNotes((prev) => ({
+                        ...prev,
+                        [app.id]: e.target.value,
+                      }))
+                    }
+                    className="w-full bg-[#1a1a2e] border border-white/[0.08] text-white text-sm px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#175aff]"
+                  />
+                  <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {app.documents.length === 0 ? (
+                      <p className="text-sm text-[#a0a0b0]">No documents uploaded</p>
+                    ) : (
+                      app.documents.map((doc) => (
+                        <div
+                          key={doc.id}
+                          className="rounded-lg border border-white/[0.08] p-3 text-sm"
+                        >
+                          <p className="text-white font-medium capitalize">
+                            {doc.document_type.replace(/_/g, " ")}
+                          </p>
+                          <p className="text-xs text-[#a0a0b0] truncate mt-0.5">
+                            {doc.file_name ?? doc.file_path}
+                          </p>
+                          {doc.signed_url ? (
+                            <a
+                              href={doc.signed_url}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="inline-block mt-2 text-[#4d7dff] hover:underline text-xs"
+                            >
+                              View document
+                            </a>
+                          ) : (
+                            <p className="mt-2 text-xs text-[#a0a0b0]">
+                              Preview unavailable
+                            </p>
+                          )}
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </section>
 
         <section>
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">

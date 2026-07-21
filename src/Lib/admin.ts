@@ -101,3 +101,50 @@ export function fetchWaitlistSignups(params?: {
     `/api/admin/waitlist${qs ? `?${qs}` : ""}`,
   );
 }
+
+export interface RiderVerificationDocument {
+  id: string;
+  rider_id: string;
+  document_type: string;
+  file_path: string;
+  file_name: string | null;
+  review_status: string;
+  admin_notes: string | null;
+  created_at: string;
+  signed_url?: string | null;
+}
+
+export interface RiderVerificationApplication {
+  id: string;
+  email: string;
+  full_name: string;
+  phone: string;
+  vehicle_type: string | null;
+  plate_number: string | null;
+  account_verification_status: string;
+  created_at: string;
+  updated_at: string;
+  documents: RiderVerificationDocument[];
+}
+
+export function fetchPendingRiderVerifications() {
+  return adminFetch<{
+    applications: RiderVerificationApplication[];
+    total: number;
+  }>("/api/admin/rider-verifications");
+}
+
+export function reviewRiderVerification(params: {
+  action: "approve" | "reject";
+  rider_id: string;
+  admin_notes?: string;
+}) {
+  return adminFetch<{
+    success: boolean;
+    rider_id: string;
+    account_verification_status: string;
+  }>("/api/admin/rider-verifications", {
+    method: "POST",
+    body: JSON.stringify(params),
+  });
+}
