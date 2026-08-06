@@ -1,6 +1,7 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { createClient } from "@supabase/supabase-js";
 import { Resend } from "resend";
+import { waitUntil } from "@vercel/functions";
 import { applyCors, corsHeaders, handleCorsOptions } from "./_lib/cors.js";
 
 type WaitlistRole = "customer" | "rider";
@@ -107,6 +108,41 @@ function buildAdminEmailHtml(payload: WaitlistPayload) {
   `;
 }
 
+// Sends the confirmation + admin-notification emails. Runs in the background
+// (via waitUntil) after the response is sent, so email latency never blocks the
+// user. Never throws — failures are logged, and the signup is already saved.
+async function sendWaitlistEmails(payload: WaitlistPayload) {
+  try {
+    const resend = new Resend(getEnv("RESEND_API_KEY"));
+    const fromEmail = getEnv("RESEND_FROM_EMAIL");
+    const adminEmail = process.env.ADMIN_NOTIFY_EMAIL ?? "Ridely.inc@gmail.com";
+
+    const [userEmail, adminEmailResult] = await Promise.all([
+      resend.emails.send({
+        from: fromEmail,
+        to: [payload.email],
+        subject: "You're on the Ridely waitlist!",
+        html: buildUserEmailHtml(payload.name, payload.role),
+      }),
+      resend.emails.send({
+        from: fromEmail,
+        to: [adminEmail],
+        subject: `New waitlist signup: ${payload.name} (${payload.role})`,
+        html: buildAdminEmailHtml(payload),
+      }),
+    ]);
+
+    if (userEmail.error) {
+      console.error("Resend user email error:", userEmail.error);
+    }
+    if (adminEmailResult.error) {
+      console.error("Resend admin email error:", adminEmailResult.error);
+    }
+  } catch (err) {
+    console.error("Waitlist email send failed:", err);
+  }
+}
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const headers = corsHeaders(req.headers.origin, "POST, OPTIONS");
 
@@ -153,33 +189,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(500).json({ error: "Failed to save signup. Please try again." });
     }
 
-    const resend = new Resend(getEnv("RESEND_API_KEY"));
-    const fromEmail = getEnv("RESEND_FROM_EMAIL");
-    const adminEmail = process.env.ADMIN_NOTIFY_EMAIL ?? "Ridely.inc@gmail.com";
+    // Signup is saved — respond immediately. Emails send in the background so
+    // Resend latency never blocks the user. waitUntil keeps the serverless
+    // function alive until the sends complete (a bare fire-and-forget would be
+    // frozen the moment the response is sent).
+    waitUntil(sendWaitlistEmails(payload));
 
-    const [userEmail, adminEmailResult] = await Promise.all([
-      resend.emails.send({
-        from: fromEmail,
-        to: [payload.email],
-        subject: "You're on the Ridely waitlist!",
-        html: buildUserEmailHtml(payload.name, payload.role),
-      }),
-      resend.emails.send({
-        from: fromEmail,
-        to: [adminEmail],
-        subject: `New waitlist signup: ${payload.name} (${payload.role})`,
-        html: buildAdminEmailHtml(payload),
-      }),
-    ]);
-
-    if (userEmail.error) {
-      console.error("Resend user email error:", userEmail.error);
-    }
-    if (adminEmailResult.error) {
-      console.error("Resend admin email error:", adminEmailResult.error);
-    }
-
-    // Signup is saved even if email delivery fails
     return res.status(201).json({ success: true });
   } catch (err) {
     console.error("Waitlist API error:", err);

@@ -16,7 +16,6 @@ interface StatItem {
 const STATS: StatItem[] = [
   { value: 32, suffix: "%", label: "Average Savings" },
   { value: 4.9, suffix: "★", label: "Beta Release Rating", isDecimal: true },
-  { value: 2, suffix: "nd", prefix: "", label: "Place Techstars Hackathon" },
 ];
 
 const StatsBar = () => {
@@ -58,7 +57,7 @@ const StatsBar = () => {
       aria-label="Ridely statistics"
     >
       <div className="container px-4">
-        <div className="flex overflow-x-auto snap-x snap-mandatory lg:overflow-visible lg:grid lg:grid-cols-3 gap-0 scrollbar-hide max-w-4xl mx-auto">
+        <div className="flex overflow-x-auto snap-x snap-mandatory lg:overflow-visible lg:grid lg:grid-cols-2 gap-0 scrollbar-hide max-w-2xl mx-auto">
           {STATS.map((stat, index) => (
             <div
               key={stat.label}

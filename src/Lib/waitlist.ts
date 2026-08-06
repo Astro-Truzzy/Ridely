@@ -15,11 +15,19 @@ const API_BASE = import.meta.env.VITE_API_URL ?? "";
 export async function submitWaitlistSignup(
   data: WaitlistSignup,
 ): Promise<{ success: true } | { error: string }> {
-  const response = await fetch(`${API_BASE}/api/waitlist`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
-  });
+  let response: Response;
+  try {
+    response = await fetch(`${API_BASE}/api/waitlist`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+  } catch {
+    return {
+      error:
+        "We couldn't reach the server. Please check your connection and try again.",
+    };
+  }
 
   const body = await response.json().catch(() => ({}));
 

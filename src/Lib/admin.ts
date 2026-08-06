@@ -155,3 +155,136 @@ export function reviewRiderVerification(params: {
     body: JSON.stringify(params),
   });
 }
+
+// ── App operational metrics ─────────────────────────────────────────────────
+// Every panel is wrapped in an {available, data} envelope so a not-yet-applied
+// RPC (supabase/admin-dashboard-setup.sql) shows a "connect" state, not a crash.
+
+export type MetricResult<T> =
+  | { available: true; data: T }
+  | { available: false; error?: string };
+
+export interface Overview {
+  users: {
+    customers: number;
+    riders: number;
+    total: number;
+    newToday: number;
+    newThisWeek: number;
+  };
+  deliveries: {
+    total: number;
+    today: number;
+    thisWeek: number;
+    active: number;
+    completed: number;
+    cancelled: number;
+  };
+  revenue: {
+    gross: number;
+    commission: number;
+    riderEarnings: number;
+    walletFloat: number;
+  };
+}
+
+export interface EarningsPoint {
+  period: string;
+  gross: number;
+  commission: number;
+  deliveries: number;
+}
+
+export interface FunnelStage {
+  status: string;
+  bucket: "active" | "completed" | "cancelled";
+  count: number;
+}
+
+export interface Funnel {
+  stages: FunnelStage[];
+  total: number;
+  completionRate: number;
+}
+
+export interface Hotzone {
+  lat: number;
+  lng: number;
+  label: string;
+  count: number;
+  intensity: number;
+}
+
+export interface LeaderRider {
+  id: string;
+  name: string;
+  earnings: number;
+  deliveries: number;
+}
+
+export interface LeaderCustomer {
+  id: string;
+  name: string;
+  spend: number;
+  orders: number;
+}
+
+export interface Leaderboards {
+  topRiders: LeaderRider[];
+  topCustomers: LeaderCustomer[];
+}
+
+export interface ActivityItem {
+  type: string;
+  label: string;
+  sub: string;
+  at: string;
+}
+
+export type EarningsBucket = "day" | "week" | "month";
+
+export interface AppMetrics {
+  overview: MetricResult<Overview>;
+  earnings: Record<EarningsBucket, MetricResult<EarningsPoint[]>>;
+  funnel: MetricResult<Funnel>;
+  hotzones: {
+    delivery: MetricResult<Hotzone[]>;
+    rider: MetricResult<Hotzone[]>;
+  };
+  leaderboards: MetricResult<Leaderboards>;
+  activity: MetricResult<ActivityItem[]>;
+}
+
+export function fetchAppMetrics() {
+  return adminFetch<AppMetrics>("/api/admin/metrics");
+}
+
+export interface AppUser {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  role: "customer" | "rider";
+  wallet_balance: number;
+  created_at: string | null;
+}
+
+export function fetchAppUsers(params?: {
+  role?: string;
+  search?: string;
+  limit?: number;
+  offset?: number;
+}) {
+  const query = new URLSearchParams();
+  if (params?.role) query.set("role", params.role);
+  if (params?.search) query.set("search", params.search);
+  if (params?.limit) query.set("limit", String(params.limit));
+  if (params?.offset) query.set("offset", String(params.offset));
+  const qs = query.toString();
+  return adminFetch<{
+    available: boolean;
+    rows: AppUser[];
+    total: number;
+    error?: string;
+  }>(`/api/admin/app-users${qs ? `?${qs}` : ""}`);
+}

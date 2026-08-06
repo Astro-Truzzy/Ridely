@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { CheckCircle } from "lucide-react";
+import { CheckCircle, X } from "lucide-react";
 
 export default function ThankYouPopup({
   show,
@@ -24,6 +24,8 @@ export default function ThankYouPopup({
       }, 50);
 
       return () => clearInterval(interval);
+    } else {
+      setProgress(0);
     }
   }, [show, onClose]);
 
@@ -38,18 +40,24 @@ export default function ThankYouPopup({
           className="fixed bottom-4 right-4 sm:bottom-8 sm:right-8 left-4 sm:left-auto bg-[#111118] border border-white/[0.08] backdrop-blur-xl shadow-2xl shadow-black/50 rounded-xl p-4 sm:p-6 flex items-center gap-3 sm:gap-4 z-[60] max-w-sm sm:max-w-md"
         >
           <CheckCircle className="text-[#4d7dff] w-6 h-6 shrink-0" />
-          <div className="min-w-0">
+          <div className="min-w-0 flex-1">
             <h4 className="text-base sm:text-lg font-semibold text-white">
               You&apos;re on the list!
             </h4>
             <p className="text-sm text-[#a0a0b0]">
               Thanks for joining{" "}
               <span className="text-[#175aff] font-medium">Ridely</span>.
-              Redirecting you now…
             </p>
           </div>
+          <button
+            onClick={onClose}
+            className="p-1.5 rounded-lg text-[#a0a0b0] hover:text-white hover:bg-white/[0.06] transition-colors shrink-0"
+            aria-label="Close notification"
+          >
+            <X className="w-4 h-4" />
+          </button>
           <svg
-            className="w-9 h-9 sm:w-10 sm:h-10 ml-auto shrink-0"
+            className="w-9 h-9 sm:w-10 sm:h-10 shrink-0"
             viewBox="0 0 36 36"
             aria-hidden="true"
           >

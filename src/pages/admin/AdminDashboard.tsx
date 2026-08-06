@@ -1,124 +1,88 @@
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { AnimatePresence, motion } from "framer-motion";
+import { Menu } from "lucide-react";
 import {
   clearAdminToken,
+  fetchAppMetrics,
   fetchDashboardStats,
   fetchPendingRiderVerifications,
   fetchWaitlistSignups,
   getAdminToken,
-  reviewRiderVerification,
+  type AppMetrics,
   type DashboardStats,
   type RiderVerificationApplication,
   type WaitlistSignup,
 } from "../../Lib/admin";
 import ridelyLogo from "../../assets/brand";
+import Sidebar from "./components/Sidebar";
+import { buildNav, type SectionId } from "./nav";
+import { prefersReducedMotion } from "./format";
+import Overview from "./sections/Overview";
+import Users from "./sections/Users";
+import Deliveries from "./sections/Deliveries";
+import Finance from "./sections/Finance";
+import Verification from "./sections/Verification";
+import Traffic from "./sections/Traffic";
 
-function StatCard({
-  label,
-  value,
-  sub,
-}: {
-  label: string;
-  value: number | string;
-  sub?: string;
-}) {
-  return (
-    <div className="glass-card rounded-xl p-5">
-      <p className="text-[#a0a0b0] text-sm">{label}</p>
-      <p className="text-3xl font-bold text-white mt-1">{value}</p>
-      {sub && <p className="text-xs text-[#a0a0b0] mt-1">{sub}</p>}
-    </div>
-  );
-}
-
-function formatDate(iso: string) {
-  return new Date(iso).toLocaleString("en-NG", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  });
-}
-
-function formatDay(date: string) {
-  return new Date(date + "T12:00:00").toLocaleDateString("en-NG", {
-    weekday: "short",
-    month: "short",
-    day: "numeric",
-  });
-}
+const SECTION_TITLES: Record<SectionId, string> = {
+  overview: "Overview",
+  users: "Users",
+  deliveries: "Deliveries",
+  finance: "Finance",
+  verification: "Verification",
+  traffic: "Traffic",
+};
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
+  const reducedMotion = prefersReducedMotion();
+
+  const [active, setActive] = useState<SectionId>("overview");
+  const [collapsed, setCollapsed] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+
   const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [metrics, setMetrics] = useState<AppMetrics | null>(null);
   const [signups, setSignups] = useState<WaitlistSignup[]>([]);
-  const [totalSignups, setTotalSignups] = useState(0);
-  const [roleFilter, setRoleFilter] = useState<"" | "customer" | "rider">("");
-  const [search, setSearch] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
   const [applications, setApplications] = useState<
     RiderVerificationApplication[]
   >([]);
-  const [reviewingId, setReviewingId] = useState<string | null>(null);
-  const [rejectNotes, setRejectNotes] = useState<Record<string, string>>({});
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState("");
 
-  useEffect(() => {
-    const timer = setTimeout(() => setDebouncedSearch(search), 300);
-    return () => clearTimeout(timer);
-  }, [search]);
+  const goToLogin = useCallback(() => {
+    clearAdminToken();
+    navigate("/admin/login", { replace: true });
+  }, [navigate]);
 
   const loadData = useCallback(async () => {
-    setLoading(true);
+    setRefreshing(true);
     setError("");
     try {
-      const [statsData, waitlistData, verificationData] = await Promise.all([
-        fetchDashboardStats(),
-        fetchWaitlistSignups({
-          role: roleFilter || undefined,
-          search: debouncedSearch,
-        }),
-        fetchPendingRiderVerifications(),
-      ]);
+      const [statsData, metricsData, waitlistData, verificationData] =
+        await Promise.all([
+          fetchDashboardStats(),
+          fetchAppMetrics(),
+          fetchWaitlistSignups({}),
+          fetchPendingRiderVerifications(),
+        ]);
       setStats(statsData);
+      setMetrics(metricsData);
       setSignups(waitlistData.signups);
-      setTotalSignups(waitlistData.total);
       setApplications(verificationData.applications);
     } catch (err) {
       if (err instanceof Error && err.message === "Unauthorized") {
-        clearAdminToken();
-        navigate("/admin/login", { replace: true });
+        goToLogin();
         return;
       }
       setError(err instanceof Error ? err.message : "Failed to load dashboard");
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
-  }, [navigate, roleFilter, debouncedSearch]);
-
-  const handleReview = async (
-    riderId: string,
-    action: "approve" | "reject",
-  ) => {
-    setReviewingId(riderId);
-    setError("");
-    try {
-      await reviewRiderVerification({
-        action,
-        rider_id: riderId,
-        admin_notes: action === "reject" ? rejectNotes[riderId] : undefined,
-      });
-      setApplications((prev) => prev.filter((a) => a.id !== riderId));
-    } catch (err) {
-      if (err instanceof Error && err.message === "Unauthorized") {
-        clearAdminToken();
-        navigate("/admin/login", { replace: true });
-        return;
-      }
-      setError(err instanceof Error ? err.message : "Review failed");
-    } finally {
-      setReviewingId(null);
-    }
-  };
+  }, [goToLogin]);
 
   useEffect(() => {
     if (!getAdminToken()) {
@@ -128,14 +92,9 @@ export default function AdminDashboard() {
     loadData();
   }, [loadData, navigate]);
 
-  const maxVisits = Math.max(...(stats?.visits.perDay.map((d) => d.visits) ?? [1]), 1);
+  const nav = buildNav(applications.length);
 
-  const handleLogout = () => {
-    clearAdminToken();
-    navigate("/admin/login", { replace: true });
-  };
-
-  if (loading && !stats) {
+  if (loading && !stats && !metrics) {
     return (
       <div
         className="min-h-screen flex items-center justify-center"
@@ -146,289 +105,89 @@ export default function AdminDashboard() {
     );
   }
 
+  const renderSection = () => {
+    switch (active) {
+      case "overview":
+        return <Overview stats={stats} metrics={metrics} />;
+      case "users":
+        return (
+          <Users metrics={metrics} signups={signups} onAuthError={goToLogin} />
+        );
+      case "deliveries":
+        return <Deliveries metrics={metrics} />;
+      case "finance":
+        return <Finance metrics={metrics} />;
+      case "verification":
+        return (
+          <Verification
+            applications={applications}
+            onReviewed={(riderId) =>
+              setApplications((prev) => prev.filter((a) => a.id !== riderId))
+            }
+            onAuthError={goToLogin}
+          />
+        );
+      case "traffic":
+        return <Traffic stats={stats} />;
+    }
+  };
+
   return (
     <div className="min-h-screen" style={{ background: "#0a0a0f" }}>
-      <header className="border-b border-white/[0.08] px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <img src={ridelyLogo} alt="Ridely" className="h-8" />
-          <span className="text-white font-semibold">Admin</span>
-        </div>
-        <div className="flex items-center gap-3">
+      <Sidebar
+        nav={nav}
+        active={active}
+        onSelect={setActive}
+        collapsed={collapsed}
+        onToggleCollapse={() => setCollapsed((c) => !c)}
+        onRefresh={loadData}
+        onLogout={goToLogin}
+        refreshing={refreshing}
+        mobileOpen={mobileOpen}
+        onCloseMobile={() => setMobileOpen(false)}
+      />
+
+      {/* Content column — offset by the desktop rail width */}
+      <div
+        className={`transition-[padding] duration-300 ${
+          collapsed ? "lg:pl-[76px]" : "lg:pl-[240px]"
+        }`}
+      >
+        {/* Top bar */}
+        <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-white/[0.08] bg-[#0a0a0f]/80 backdrop-blur px-4 sm:px-6 h-16">
           <button
-            onClick={loadData}
-            className="text-sm text-[#a0a0b0] hover:text-white transition-colors"
+            onClick={() => setMobileOpen(true)}
+            className="lg:hidden p-1.5 -ml-1 text-[#a0a0b0] hover:text-white rounded-lg"
+            aria-label="Open menu"
           >
-            Refresh
+            <Menu className="w-5 h-5" />
           </button>
-          <button
-            onClick={handleLogout}
-            className="text-sm text-[#a0a0b0] hover:text-white transition-colors"
-          >
-            Log out
-          </button>
-        </div>
-      </header>
+          <img src={ridelyLogo} alt="Ridely" className="h-7 lg:hidden" />
+          <h1 className="text-white font-semibold text-lg hidden lg:block">
+            {SECTION_TITLES[active]}
+          </h1>
+          {refreshing && (
+            <span className="ml-auto text-xs text-[#a0a0b0]">Refreshing…</span>
+          )}
+        </header>
 
-      <main className="max-w-7xl mx-auto px-6 py-8 space-y-8">
-        {error && (
-          <p className="text-red-400 text-sm text-center">{error}</p>
-        )}
-
-        {stats && (
-          <>
-            <section>
-              <h2 className="text-lg font-semibold text-white mb-4">Site visits</h2>
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                <StatCard label="Total visits" value={stats.visits.total} />
-                <StatCard
-                  label="Today"
-                  value={stats.visits.today}
-                  sub={`${stats.visits.uniqueToday} unique`}
-                />
-                <StatCard
-                  label="This week"
-                  value={stats.visits.thisWeek}
-                  sub={`${stats.visits.uniqueThisWeek} unique`}
-                />
-                <StatCard
-                  label="Top page"
-                  value={stats.visits.topPages[0]?.path ?? "—"}
-                  sub={
-                    stats.visits.topPages[0]
-                      ? `${stats.visits.topPages[0].count} views`
-                      : undefined
-                  }
-                />
-              </div>
-            </section>
-
-            <section className="grid lg:grid-cols-2 gap-6">
-              <div className="glass-card rounded-xl p-5">
-                <h3 className="text-white font-medium mb-4">Visits — last 7 days</h3>
-                <div className="flex items-end gap-2 h-40">
-                  {stats.visits.perDay.map((day) => (
-                    <div key={day.date} className="flex-1 flex flex-col items-center gap-1">
-                      <div
-                        className="w-full rounded-t bg-[#175aff]/80 min-h-[4px]"
-                        style={{
-                          height: `${Math.max((day.visits / maxVisits) * 100, 4)}%`,
-                        }}
-                        title={`${day.visits} visits, ${day.unique} unique`}
-                      />
-                      <span className="text-[10px] text-[#a0a0b0] text-center leading-tight">
-                        {formatDay(day.date)}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="glass-card rounded-xl p-5">
-                <h3 className="text-white font-medium mb-4">Waitlist overview</h3>
-                <div className="grid grid-cols-2 gap-4">
-                  <StatCard label="Total signups" value={stats.waitlist.total} />
-                  <StatCard
-                    label="This week"
-                    value={stats.waitlist.thisWeek}
-                    sub={`+${stats.waitlist.today} today`}
-                  />
-                  <StatCard label="Customers" value={stats.waitlist.customers} />
-                  <StatCard label="Riders" value={stats.waitlist.riders} />
-                </div>
-              </div>
-            </section>
-          </>
-        )}
-
-        <section>
-          <h2 className="text-lg font-semibold text-white mb-4">
-            Rider verification
-            <span className="text-[#a0a0b0] text-sm font-normal ml-2">
-              ({applications.length} pending)
-            </span>
-          </h2>
-          <div className="space-y-4">
-            {applications.length === 0 ? (
-              <div className="glass-card rounded-xl px-4 py-8 text-center text-[#a0a0b0] text-sm">
-                No pending rider applications
-              </div>
-            ) : (
-              applications.map((app) => (
-                <div
-                  key={app.id}
-                  className="glass-card rounded-xl p-5 space-y-4"
-                >
-                  <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
-                    <div>
-                      <p className="text-white font-medium">{app.full_name}</p>
-                      <p className="text-sm text-[#a0a0b0]">
-                        {app.email}
-                        {app.phone ? ` · ${app.phone}` : ""}
-                      </p>
-                      <p className="text-xs text-[#a0a0b0] mt-1">
-                        {app.vehicle_type ?? "Vehicle n/a"}
-                        {app.plate_number ? ` · ${app.plate_number}` : ""}
-                        {" · "}
-                        Updated {formatDate(app.updated_at)}
-                      </p>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      <button
-                        type="button"
-                        disabled={reviewingId === app.id}
-                        onClick={() => handleReview(app.id, "approve")}
-                        className="px-3 py-1.5 rounded-lg text-sm font-medium bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30 disabled:opacity-50"
-                      >
-                        {reviewingId === app.id ? "…" : "Approve"}
-                      </button>
-                      <button
-                        type="button"
-                        disabled={reviewingId === app.id}
-                        onClick={() => handleReview(app.id, "reject")}
-                        className="px-3 py-1.5 rounded-lg text-sm font-medium bg-red-500/20 text-red-300 hover:bg-red-500/30 disabled:opacity-50"
-                      >
-                        Reject
-                      </button>
-                    </div>
-                  </div>
-                  <input
-                    type="text"
-                    placeholder="Optional reject notes…"
-                    value={rejectNotes[app.id] ?? ""}
-                    onChange={(e) =>
-                      setRejectNotes((prev) => ({
-                        ...prev,
-                        [app.id]: e.target.value,
-                      }))
-                    }
-                    className="w-full bg-[#1a1a2e] border border-white/[0.08] text-white text-sm px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#175aff]"
-                  />
-                  <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                    {app.documents.length === 0 ? (
-                      <p className="text-sm text-[#a0a0b0]">No documents uploaded</p>
-                    ) : (
-                      app.documents.map((doc) => (
-                        <div
-                          key={doc.id}
-                          className="rounded-lg border border-white/[0.08] p-3 text-sm"
-                        >
-                          <p className="text-white font-medium capitalize">
-                            {doc.document_type.replace(/_/g, " ")}
-                          </p>
-                          <p className="text-xs text-[#a0a0b0] truncate mt-0.5">
-                            {doc.file_name ?? doc.file_path}
-                          </p>
-                          {doc.signed_url ? (
-                            <a
-                              href={doc.signed_url}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="inline-block mt-2 text-[#4d7dff] hover:underline text-xs"
-                            >
-                              View document
-                            </a>
-                          ) : (
-                            <p className="mt-2 text-xs text-[#a0a0b0]">
-                              Preview unavailable
-                            </p>
-                          )}
-                        </div>
-                      ))
-                    )}
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-        </section>
-
-        <section>
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
-            <h2 className="text-lg font-semibold text-white">
-              Waitlist signups
-              <span className="text-[#a0a0b0] text-sm font-normal ml-2">
-                ({totalSignups})
-              </span>
-            </h2>
-            <div className="flex gap-2">
-              <input
-                type="search"
-                placeholder="Search name, email, city…"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="bg-[#1a1a2e] border border-white/[0.08] text-white text-sm px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#175aff] w-full sm:w-56"
-              />
-              <select
-                value={roleFilter}
-                onChange={(e) =>
-                  setRoleFilter(e.target.value as "" | "customer" | "rider")
-                }
-                className="bg-[#1a1a2e] border border-white/[0.08] text-white text-sm px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#175aff]"
-              >
-                <option value="">All roles</option>
-                <option value="customer">Customers</option>
-                <option value="rider">Riders</option>
-              </select>
-            </div>
-          </div>
-
-          <div className="glass-card rounded-xl overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-white/[0.08] text-[#a0a0b0] text-left">
-                    <th className="px-4 py-3 font-medium">Name</th>
-                    <th className="px-4 py-3 font-medium">Email</th>
-                    <th className="px-4 py-3 font-medium">Role</th>
-                    <th className="px-4 py-3 font-medium">City</th>
-                    <th className="px-4 py-3 font-medium">Details</th>
-                    <th className="px-4 py-3 font-medium">Joined</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {signups.length === 0 ? (
-                    <tr>
-                      <td colSpan={6} className="px-4 py-8 text-center text-[#a0a0b0]">
-                        No signups yet
-                      </td>
-                    </tr>
-                  ) : (
-                    signups.map((s) => (
-                      <tr
-                        key={s.id}
-                        className="border-b border-white/[0.04] hover:bg-white/[0.02]"
-                      >
-                        <td className="px-4 py-3 text-white">{s.name}</td>
-                        <td className="px-4 py-3 text-[#a0a0b0]">{s.email}</td>
-                        <td className="px-4 py-3">
-                          <span
-                            className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${
-                              s.role === "rider"
-                                ? "bg-[#175aff]/20 text-[#4d7dff]"
-                                : "bg-purple-500/20 text-purple-300"
-                            }`}
-                          >
-                            {s.role}
-                          </span>
-                        </td>
-                        <td className="px-4 py-3 text-[#a0a0b0]">{s.city}</td>
-                        <td className="px-4 py-3 text-[#a0a0b0]">
-                          {s.role === "customer"
-                            ? s.sex
-                            : `Age ${s.age}${s.phone ? ` · ${s.phone}` : ""}`}
-                        </td>
-                        <td className="px-4 py-3 text-[#a0a0b0] whitespace-nowrap">
-                          {formatDate(s.created_at)}
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </section>
-      </main>
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+          {error && (
+            <p className="text-red-400 text-sm text-center mb-6">{error}</p>
+          )}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={active}
+              initial={reducedMotion ? {} : { opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={reducedMotion ? {} : { opacity: 0, y: -8 }}
+              transition={{ duration: 0.2 }}
+            >
+              {renderSection()}
+            </motion.div>
+          </AnimatePresence>
+        </main>
+      </div>
     </div>
   );
 }

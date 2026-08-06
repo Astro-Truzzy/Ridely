@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { XMarkIcon as XIcon } from "@heroicons/react/24/outline";
 import ThankYouPopup from "./ThankYouPopup";
@@ -30,16 +30,15 @@ export default function WaitlistModal({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
 
-  useEffect(() => {
-    if (showPopup) {
-      const timeout = setTimeout(() => {
-        setShowPopup(false);
-        onClose();
-        window.location.href = "/";
-      }, 5000);
-      return () => clearTimeout(timeout);
-    }
-  }, [showPopup, onClose]);
+  const handlePopupClose = () => {
+    setShowPopup(false);
+    onClose();
+    // Reset so reopening the modal starts fresh at role selection.
+    setRole(null);
+    setFormData({ name: "", email: "", city: "", sex: "", age: "", phone: "" });
+    setErrors({});
+    setSubmitError("");
+  };
 
   const validate = () => {
     const newErrors: { [key: string]: string } = {};
@@ -69,24 +68,31 @@ export default function WaitlistModal({
     setSubmitError("");
     setIsSubmitting(true);
 
-    const result = await submitWaitlistSignup({
-      role,
-      name: formData.name.trim(),
-      email: formData.email.trim(),
-      city: formData.city.trim(),
-      ...(role === "customer"
-        ? { sex: formData.sex }
-        : { age: formData.age, phone: formData.phone.trim() }),
-    });
+    try {
+      const result = await submitWaitlistSignup({
+        role,
+        name: formData.name.trim(),
+        email: formData.email.trim(),
+        city: formData.city.trim(),
+        ...(role === "customer"
+          ? { sex: formData.sex }
+          : { age: formData.age, phone: formData.phone.trim() }),
+      });
 
-    setIsSubmitting(false);
+      if ("error" in result) {
+        setSubmitError(result.error);
+        return;
+      }
 
-    if ("error" in result) {
-      setSubmitError(result.error);
-      return;
+      // Success: close the modal and let the toast stand on its own so it's
+      // fully visible (outside the modal's overflow/transform container).
+      setShowPopup(true);
+      onClose();
+    } catch {
+      setSubmitError("Something went wrong. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
-
-    setShowPopup(true);
   };
 
   const modalVariants = {
@@ -100,26 +106,25 @@ export default function WaitlistModal({
     "w-full bg-[#1a1a2e] border border-white/[0.08] text-white placeholder:text-[#a0a0b0] px-3 py-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#175aff] focus:border-transparent transition-shadow text-base";
 
   return (
-    <AnimatePresence>
-      {show && (
-        <motion.div
-          className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-          initial="hidden"
-          animate="visible"
-          exit="exit"
-          variants={modalVariants}
-        >
-          <motion.div className="bg-[#111118] border border-white/[0.08] backdrop-blur-xl p-6 sm:p-8 rounded-2xl w-full max-w-md shadow-2xl shadow-black/50 relative max-h-[90vh] overflow-y-auto">
-            <button
-              onClick={onClose}
-              className="absolute top-3 right-3 p-1.5 rounded-lg text-[#a0a0b0] hover:text-white hover:bg-white/[0.06] transition-colors"
-              title="Close"
-              aria-label="Close"
-            >
-              <XIcon className="h-5 w-5" />
-            </button>
-
-            {showPopup && <ThankYouPopup show={showPopup} onClose={onClose} />}
+    <>
+      <AnimatePresence>
+        {show && (
+          <motion.div
+            className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            variants={modalVariants}
+          >
+            <motion.div className="bg-[#111118] border border-white/[0.08] backdrop-blur-xl p-6 sm:p-8 rounded-2xl w-full max-w-md shadow-2xl shadow-black/50 relative max-h-[90vh] overflow-y-auto">
+              <button
+                onClick={onClose}
+                className="absolute top-3 right-3 p-1.5 rounded-lg text-[#a0a0b0] hover:text-white hover:bg-white/[0.06] transition-colors"
+                title="Close"
+                aria-label="Close"
+              >
+                <XIcon className="h-5 w-5" />
+              </button>
 
             {!role && !showPopup && (
               <>
@@ -338,9 +343,12 @@ export default function WaitlistModal({
                 </div>
               </form>
             )}
+            </motion.div>
           </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+        )}
+      </AnimatePresence>
+
+      <ThankYouPopup show={showPopup} onClose={handlePopupClose} />
+    </>
   );
 }
