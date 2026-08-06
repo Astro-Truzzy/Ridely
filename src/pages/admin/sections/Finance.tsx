@@ -5,6 +5,7 @@ import StatCard from "../components/StatCard";
 import Section from "../components/Section";
 import BarChart from "../components/BarChart";
 import Leaderboard from "../components/Leaderboard";
+import WalletBalances from "../components/WalletBalances";
 import { PanelUnavailable } from "../components/PanelState";
 import { formatNaira, formatCompact } from "../format";
 
@@ -14,7 +15,13 @@ const BUCKETS: { id: EarningsBucket; label: string; window: string }[] = [
   { id: "month", label: "Monthly", window: "last 12 months" },
 ];
 
-export default function Finance({ metrics }: { metrics: AppMetrics | null }) {
+export default function Finance({
+  metrics,
+  onAuthError,
+}: {
+  metrics: AppMetrics | null;
+  onAuthError: () => void;
+}) {
   const [bucket, setBucket] = useState<EarningsBucket>("day");
   const overview = metrics?.overview;
   const earnings = metrics?.earnings[bucket];
@@ -59,6 +66,9 @@ export default function Finance({ metrics }: { metrics: AppMetrics | null }) {
           <PanelUnavailable label="Financial metrics aren’t connected yet." />
         )}
       </Section>
+
+      {/* Per-customer wallet balances */}
+      <WalletBalances onAuthError={onAuthError} />
 
       {/* Earnings over time with bucket toggle */}
       <div className="glass-card rounded-xl p-5">

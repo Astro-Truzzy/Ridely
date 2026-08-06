@@ -1,13 +1,16 @@
 import { useCallback, useEffect, useState } from "react";
-import { Users as UsersIcon, Wallet } from "lucide-react";
+import { Users as UsersIcon, Wallet, Trash2 } from "lucide-react";
+import toast from "react-hot-toast";
 import {
   fetchAppUsers,
+  deleteAppUser,
   type AppUser,
   type AppMetrics,
   type WaitlistSignup,
 } from "../../../Lib/admin";
 import StatCard from "../components/StatCard";
 import Section from "../components/Section";
+import ConfirmDialog from "../components/ConfirmDialog";
 import { PanelUnavailable } from "../components/PanelState";
 import { formatDate, formatNaira } from "../format";
 
@@ -45,6 +48,8 @@ export default function Users({
   const [debounced, setDebounced] = useState("");
   const [page, setPage] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [pendingDelete, setPendingDelete] = useState<AppUser | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     const t = setTimeout(() => setDebounced(search), 300);
@@ -75,6 +80,35 @@ export default function Users({
   useEffect(() => {
     load();
   }, [load]);
+
+  const confirmDelete = useCallback(async () => {
+    if (!pendingDelete) return;
+    setDeleting(true);
+    try {
+      const res = await deleteAppUser({
+        id: pendingDelete.id,
+        role: pendingDelete.role,
+      });
+      toast.success(
+        `${pendingDelete.name || "Account"} deleted${
+          res.authRemoved ? "" : " (login could not be removed)"
+        }`,
+      );
+      setPendingDelete(null);
+      // Drop the row locally, then refresh totals in the background.
+      setUsers((prev) => prev.filter((u) => u.id !== pendingDelete.id));
+      setTotal((t) => Math.max(t - 1, 0));
+      load();
+    } catch (err) {
+      if (err instanceof Error && err.message === "Unauthorized") {
+        onAuthError();
+        return;
+      }
+      toast.error(err instanceof Error ? err.message : "Failed to delete");
+    } finally {
+      setDeleting(false);
+    }
+  }, [pendingDelete, load, onAuthError]);
 
   const maxPage = Math.max(Math.ceil(total / PAGE_SIZE) - 1, 0);
 
@@ -141,18 +175,19 @@ export default function Users({
                       <th className="px-4 py-3 font-medium">Role</th>
                       <th className="px-4 py-3 font-medium text-right">Wallet</th>
                       <th className="px-4 py-3 font-medium">Joined</th>
+                      <th className="px-4 py-3 font-medium text-right">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {loading ? (
                       <tr>
-                        <td colSpan={5} className="px-4 py-8 text-center text-[#a0a0b0]">
+                        <td colSpan={6} className="px-4 py-8 text-center text-[#a0a0b0]">
                           Loading…
                         </td>
                       </tr>
                     ) : users.length === 0 ? (
                       <tr>
-                        <td colSpan={5} className="px-4 py-8 text-center text-[#a0a0b0]">
+                        <td colSpan={6} className="px-4 py-8 text-center text-[#a0a0b0]">
                           No accounts found
                         </td>
                       </tr>
@@ -177,6 +212,16 @@ export default function Users({
                           </td>
                           <td className="px-4 py-3 text-[#a0a0b0] whitespace-nowrap">
                             {u.created_at ? formatDate(u.created_at) : "—"}
+                          </td>
+                          <td className="px-4 py-3 text-right">
+                            <button
+                              onClick={() => setPendingDelete(u)}
+                              title={`Delete ${u.name}`}
+                              aria-label={`Delete ${u.name}`}
+                              className="inline-flex items-center justify-center p-1.5 rounded-lg text-[#a0a0b0] hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
                           </td>
                         </tr>
                       ))
@@ -258,6 +303,23 @@ export default function Users({
           </div>
         </div>
       </Section>
+
+      <ConfirmDialog
+        open={pendingDelete !== null}
+        title={`Delete ${pendingDelete?.role ?? "user"}?`}
+        message={
+          <>
+            <span className="text-white">{pendingDelete?.name}</span>
+            {pendingDelete?.email ? ` (${pendingDelete.email})` : ""} will be
+            permanently removed — profile
+            {pendingDelete?.role === "customer" ? ", wallet" : ""} and login
+            access. This cannot be undone.
+          </>
+        }
+        loading={deleting}
+        onConfirm={confirmDelete}
+        onCancel={() => setPendingDelete(null)}
+      />
     </div>
   );
 }

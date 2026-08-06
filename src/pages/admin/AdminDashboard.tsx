@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { Menu } from "lucide-react";
+import { Toaster } from "react-hot-toast";
 import {
   clearAdminToken,
   fetchAppMetrics,
@@ -116,7 +117,7 @@ export default function AdminDashboard() {
       case "deliveries":
         return <Deliveries metrics={metrics} />;
       case "finance":
-        return <Finance metrics={metrics} />;
+        return <Finance metrics={metrics} onAuthError={goToLogin} />;
       case "verification":
         return (
           <Verification
@@ -134,6 +135,16 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen" style={{ background: "#0a0a0f" }}>
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          style: {
+            background: "#1a1a2e",
+            color: "#fff",
+            border: "1px solid rgba(255,255,255,0.08)",
+          },
+        }}
+      />
       <Sidebar
         nav={nav}
         active={active}

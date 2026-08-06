@@ -9,12 +9,20 @@ interface AdminUsersResult {
   total: number;
 }
 
+interface AdminDeleteResult {
+  deleted: boolean;
+  auth_id?: string | null;
+  error?: string;
+}
+
 /**
- * Paginated list of app users (customers + riders) with wallet balances,
+ * GET: paginated list of app users (customers + riders) with wallet balances,
  * backed by the admin_users RPC. Mirrors api/admin/waitlist.ts shape.
+ * DELETE: removes a user/rider profile (admin_delete_user RPC) and, best-effort,
+ * their Supabase auth login so they can no longer sign in.
  */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  const headers = corsHeaders(req.headers.origin, "GET, OPTIONS");
+  const headers = corsHeaders(req.headers.origin, "GET, DELETE, OPTIONS");
 
   if (req.method === "OPTIONS") {
     return handleCorsOptions(res, headers);
@@ -22,12 +30,64 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   applyCors(res, headers);
 
-  if (req.method !== "GET") {
+  if (req.method !== "GET" && req.method !== "DELETE") {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
   if (!verifyAdminToken(getBearerToken(req))) {
     return res.status(401).json({ error: "Unauthorized" });
+  }
+
+  const supabase = getSupabase();
+
+  if (req.method === "DELETE") {
+    try {
+      const id = typeof req.query.id === "string" ? req.query.id.trim() : "";
+      const role =
+        req.query.role === "customer" || req.query.role === "rider"
+          ? req.query.role
+          : "";
+
+      if (!id || !role) {
+        return res
+          .status(400)
+          .json({ error: 'Query must include id and role "customer" | "rider"' });
+      }
+
+      const result = await callRpc<AdminDeleteResult>(
+        supabase,
+        "admin_delete_user",
+        { p_id: id, p_role: role },
+      );
+
+      if (!result.available) {
+        return res.status(500).json({
+          error: result.error ?? "Delete is not connected yet",
+        });
+      }
+      if (result.data?.error) {
+        return res.status(500).json({ error: result.data.error });
+      }
+      if (!result.data?.deleted) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      // Best-effort: remove the auth login too. The profile id equals the auth
+      // uid in this app; if it doesn't (or was already gone), ignore the error.
+      const authId = result.data.auth_id ?? id;
+      let authRemoved = false;
+      try {
+        const { error } = await supabase.auth.admin.deleteUser(authId);
+        authRemoved = !error;
+      } catch {
+        authRemoved = false;
+      }
+
+      return res.status(200).json({ success: true, deleted: true, authRemoved });
+    } catch (err) {
+      console.error("Admin delete-user error:", err);
+      return res.status(500).json({ error: "Failed to delete user" });
+    }
   }
 
   try {
@@ -43,7 +103,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     );
     const offset = parseInt(String(req.query.offset ?? "0"), 10) || 0;
 
-    const supabase = getSupabase();
     const result = await callRpc<AdminUsersResult>(supabase, "admin_users", {
       p_role: role,
       p_search: search || null,

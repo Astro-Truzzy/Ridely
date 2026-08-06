@@ -288,3 +288,41 @@ export function fetchAppUsers(params?: {
     error?: string;
   }>(`/api/admin/app-users${qs ? `?${qs}` : ""}`);
 }
+
+/** Permanently delete a customer or rider (profile + wallet + auth login). */
+export function deleteAppUser(params: {
+  id: string;
+  role: "customer" | "rider";
+}) {
+  const query = new URLSearchParams({ id: params.id, role: params.role });
+  return adminFetch<{ success: true; deleted: boolean; authRemoved: boolean }>(
+    `/api/admin/app-users?${query.toString()}`,
+    { method: "DELETE" },
+  );
+}
+
+export interface WalletHolder {
+  id: string;
+  name: string;
+  email: string;
+  wallet_balance: number;
+}
+
+export function fetchWalletBalances(params?: {
+  search?: string;
+  limit?: number;
+  offset?: number;
+}) {
+  const query = new URLSearchParams();
+  if (params?.search) query.set("search", params.search);
+  if (params?.limit) query.set("limit", String(params.limit));
+  if (params?.offset) query.set("offset", String(params.offset));
+  const qs = query.toString();
+  return adminFetch<{
+    available: boolean;
+    rows: WalletHolder[];
+    total: number;
+    sum: number;
+    error?: string;
+  }>(`/api/admin/wallets${qs ? `?${qs}` : ""}`);
+}

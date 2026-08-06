@@ -25,6 +25,8 @@
 --   select public.admin_leaderboards();
 --   select public.admin_recent_activity();
 --   select public.admin_users(null, null, 25, 0);
+--   select public.admin_wallet_balances(null, 25, 0);
+--   select public.admin_delete_user('<uuid>', 'customer');  -- (destructive)
 -- ============================================================================
 
 -- ── Introspection helpers ───────────────────────────────────────────────────
@@ -554,6 +556,120 @@ exception when others then
   return jsonb_build_object('rows', '[]'::jsonb, 'total', 0, 'error', SQLERRM);
 end; $$;
 
+-- ── admin_wallet_balances(search, limit, offset) ────────────────────────────
+-- Customer wallet balances only (riders have no wallet), joined to the users
+-- table for a name/email. Ordered by balance descending so the biggest floats
+-- surface first. Also returns the summed float across ALL matching customers so
+-- the finance panel can show a total independent of the current page.
+create or replace function public.admin_wallet_balances(
+  p_search text default null, p_limit int default 25, p_offset int default 0)
+returns jsonb language plpgsql security definer set search_path = public as $$
+declare
+  v_limit  int  := least(greatest(coalesce(p_limit, 25), 1), 100);
+  v_offset int  := greatest(coalesce(p_offset, 0), 0);
+  v_search text := nullif(trim(coalesce(p_search, '')), '');
+  base     text;
+  rows     jsonb := '[]'::jsonb;
+  v_total  bigint := 0;
+  v_sum    numeric := 0;
+  c_u_name  text := public._admin_col('users', array['full_name','name','display_name']); -- ADJUST
+  c_u_email text := public._admin_col('users', array['email','email_address']); -- ADJUST
+  c_w_user  text := public._admin_col('users_wallet', array['user_id','users_id','owner_id','customer_id']); -- ADJUST
+  c_w_bal   text := public._admin_col('users_wallet', array['balance','wallet_balance','amount','available_balance']); -- ADJUST
+begin
+  if not public._admin_has_table('users_wallet') or c_w_bal is null or c_w_user is null then
+    return jsonb_build_object('available', false, 'rows', '[]'::jsonb, 'total', 0, 'sum', 0);
+  end if;
+
+  base := format($b$
+    select u.id::text as id,
+           coalesce(%s, 'Customer') as name,
+           coalesce(%s, '') as email,
+           coalesce(w.%I, 0)::numeric as wallet_balance
+    from public.users_wallet w
+    join public.users u on w.%I = u.id
+  $b$,
+    case when c_u_name is not null then format('u.%I', c_u_name) else '''Customer''' end,
+    case when c_u_email is not null then format('u.%I', c_u_email) else 'null' end,
+    c_w_bal, c_w_user
+  );
+
+  base := format('select * from (%s) all_wallets', base);
+
+  if v_search is not null then
+    base := base || format(' where (name ilike %L or email ilike %L)',
+                           '%'||v_search||'%', '%'||v_search||'%');
+  end if;
+
+  execute format('select count(*), coalesce(sum(wallet_balance), 0) from (%s) c', base)
+    into v_total, v_sum;
+
+  execute format($q$
+    select coalesce(jsonb_agg(to_jsonb(t)), '[]'::jsonb)
+    from (%s order by wallet_balance desc nulls last limit %s offset %s) t
+  $q$, base, v_limit, v_offset) into rows;
+
+  return jsonb_build_object(
+    'available', true,
+    'rows', coalesce(rows, '[]'::jsonb),
+    'total', v_total,
+    'sum', v_sum
+  );
+exception when others then
+  return jsonb_build_object('available', false, 'rows', '[]'::jsonb, 'total', 0, 'sum', 0, 'error', SQLERRM);
+end; $$;
+
+-- ── admin_delete_user(id, role) ─────────────────────────────────────────────
+-- Deletes an app profile row and its dependent wallet (customers only). Rider
+-- verification documents cascade if the FK is ON DELETE CASCADE; otherwise we
+-- remove them first so the rider row can be deleted. Auth (auth.users) removal
+-- is handled by the API using the admin auth API, not here.
+-- Returns {deleted: bool, auth_id: text|null} — auth_id is the profile's id,
+-- which for this app equals the Supabase auth uid, so the API can delete login.
+create or replace function public.admin_delete_user(p_id text, p_role text)
+returns jsonb language plpgsql security definer set search_path = public as $$
+declare
+  v_role   text := lower(nullif(p_role, ''));
+  v_table  text;
+  c_w_user text := public._admin_col('users_wallet', array['user_id','users_id','owner_id','customer_id']); -- ADJUST
+  v_found  boolean := false;
+begin
+  if p_id is null or v_role not in ('customer', 'rider') then
+    return jsonb_build_object('deleted', false, 'error', 'invalid id/role');
+  end if;
+
+  if v_role = 'customer' then
+    v_table := 'users';
+    -- Remove the customer's wallet row(s) first (no cascade guaranteed).
+    if public._admin_has_table('users_wallet') and c_w_user is not null then
+      execute format('delete from public.users_wallet where %I::text = $1', c_w_user)
+        using p_id;
+    end if;
+  else
+    v_table := 'riders';
+    -- Best-effort remove verification docs in case there is no cascade FK.
+    if public._admin_has_table('rider_verification_documents') then
+      begin
+        execute 'delete from public.rider_verification_documents where rider_id::text = $1'
+          using p_id;
+      exception when others then null;
+      end;
+    end if;
+  end if;
+
+  if not public._admin_has_table(v_table) then
+    return jsonb_build_object('deleted', false, 'error', 'table missing');
+  end if;
+
+  execute format('delete from public.%I where id::text = $1', v_table)
+    using p_id;
+  get diagnostics v_found = row_count;
+
+  return jsonb_build_object('deleted', v_found > 0, 'auth_id', p_id);
+exception when others then
+  return jsonb_build_object('deleted', false, 'error', SQLERRM);
+end; $$;
+
 -- ── Grants: service_role only (the web API key) ─────────────────────────────
 do $$
 declare fn text;
@@ -565,7 +681,9 @@ begin
     'public.admin_hotzones(text)',
     'public.admin_leaderboards()',
     'public.admin_recent_activity()',
-    'public.admin_users(text, text, int, int)'
+    'public.admin_users(text, text, int, int)',
+    'public.admin_wallet_balances(text, int, int)',
+    'public.admin_delete_user(text, text)'
   ] loop
     execute format('revoke all on function %s from public, anon, authenticated', fn);
     execute format('grant execute on function %s to service_role', fn);
