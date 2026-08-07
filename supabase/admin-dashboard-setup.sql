@@ -619,47 +619,101 @@ exception when others then
   return jsonb_build_object('available', false, 'rows', '[]'::jsonb, 'total', 0, 'sum', 0, 'error', SQLERRM);
 end; $$;
 
+-- ── cascade-delete helpers ──────────────────────────────────────────────────
+-- Postgres refuses to delete a row that other tables still reference under a
+-- RESTRICT/NO ACTION foreign key (the default) — e.g. deleting a customer whose
+-- id appears in deliveries.user_id raises "violates foreign key constraint
+-- deliveries_user_id_fkey". These helpers hard-delete a row together with every
+-- row that (transitively) references it, discovering the FK graph at runtime so
+-- no dependent table names are hard-coded.
+
+-- First primary-key column of a table (NULL if the table has no PK).
+create or replace function public._admin_pk_of(p_rel regclass)
+returns text language sql stable security definer set search_path = public as $$
+  select a.attname
+  from pg_index i
+  join pg_attribute a on a.attrelid = i.indrelid and a.attnum = any(i.indkey)
+  where i.indrelid = p_rel and i.indisprimary
+  order by array_position(i.indkey, a.attnum)
+  limit 1;
+$$;
+
+-- Delete every row that references p_table.<pk> = p_id, depth-first (grandchild
+-- rows before child rows), so each delete satisfies its own FK constraints.
+-- Only single-column foreign keys are followed (the norm here); depth is capped
+-- as a backstop against FK cycles.
+create or replace function public._admin_cascade_delete(
+  p_table regclass, p_id text, p_depth int default 0)
+returns void language plpgsql security definer set search_path = public as $$
+declare
+  fk           record;
+  child_pk_col text;
+  child_id     record;
+begin
+  if p_depth > 8 then
+    raise exception 'admin cascade delete too deep at % (possible FK cycle)', p_table;
+  end if;
+
+  for fk in
+    select con.conrelid::regclass as child_table,
+           a.attname              as child_col
+    from pg_constraint con
+    join pg_attribute a
+      on a.attrelid = con.conrelid and a.attnum = con.conkey[1]
+    where con.contype = 'f'
+      and con.confrelid = p_table
+      and array_length(con.conkey, 1) = 1
+  loop
+    child_pk_col := public._admin_pk_of(fk.child_table);
+
+    -- Recurse into anything referencing the child rows we are about to delete.
+    if child_pk_col is not null then
+      for child_id in execute
+        format('select %I::text as id from %s where %I::text = $1',
+               child_pk_col, fk.child_table, fk.child_col)
+        using p_id
+      loop
+        if not (fk.child_table = p_table and child_id.id = p_id) then
+          perform public._admin_cascade_delete(fk.child_table, child_id.id, p_depth + 1);
+        end if;
+      end loop;
+    end if;
+
+    execute format('delete from %s where %I::text = $1', fk.child_table, fk.child_col)
+      using p_id;
+  end loop;
+end; $$;
+
 -- ── admin_delete_user(id, role) ─────────────────────────────────────────────
--- Deletes an app profile row and its dependent wallet (customers only). Rider
--- verification documents cascade if the FK is ON DELETE CASCADE; otherwise we
--- remove them first so the rider row can be deleted. Auth (auth.users) removal
--- is handled by the API using the admin auth API, not here.
--- Returns {deleted: bool, auth_id: text|null} — auth_id is the profile's id,
--- which for this app equals the Supabase auth uid, so the API can delete login.
+-- Hard-deletes an app profile (customer → users, rider → riders) together with
+-- EVERY row that references it — wallet, deliveries, transactions, verification
+-- docs, etc. — via _admin_cascade_delete. That cascade is what lets us remove a
+-- customer who already has deliveries without tripping deliveries_user_id_fkey,
+-- and it adapts automatically as new dependent tables are added.
+-- NOTE: this discards the profile's operational/financial history along with it.
+-- Auth (auth.users) removal is done by the API using the admin auth API, not
+-- here. Returns {deleted: bool, auth_id: text|null} — auth_id is the profile's
+-- id, which for this app equals the Supabase auth uid, so the API can drop login.
 create or replace function public.admin_delete_user(p_id text, p_role text)
 returns jsonb language plpgsql security definer set search_path = public as $$
 declare
-  v_role   text := lower(nullif(p_role, ''));
-  v_table  text;
-  c_w_user text := public._admin_col('users_wallet', array['user_id','users_id','owner_id','customer_id']); -- ADJUST
-  v_found  boolean := false;
+  v_role  text := lower(nullif(p_role, ''));
+  v_table text;
+  v_found boolean := false;
 begin
   if p_id is null or v_role not in ('customer', 'rider') then
     return jsonb_build_object('deleted', false, 'error', 'invalid id/role');
   end if;
 
-  if v_role = 'customer' then
-    v_table := 'users';
-    -- Remove the customer's wallet row(s) first (no cascade guaranteed).
-    if public._admin_has_table('users_wallet') and c_w_user is not null then
-      execute format('delete from public.users_wallet where %I::text = $1', c_w_user)
-        using p_id;
-    end if;
-  else
-    v_table := 'riders';
-    -- Best-effort remove verification docs in case there is no cascade FK.
-    if public._admin_has_table('rider_verification_documents') then
-      begin
-        execute 'delete from public.rider_verification_documents where rider_id::text = $1'
-          using p_id;
-      exception when others then null;
-      end;
-    end if;
-  end if;
+  v_table := case when v_role = 'customer' then 'users' else 'riders' end;
 
   if not public._admin_has_table(v_table) then
     return jsonb_build_object('deleted', false, 'error', 'table missing');
   end if;
+
+  -- Remove every dependent row that points at this profile before the profile
+  -- row itself, so no RESTRICT foreign key blocks the delete.
+  perform public._admin_cascade_delete(('public.' || v_table)::regclass, p_id);
 
   execute format('delete from public.%I where id::text = $1', v_table)
     using p_id;
@@ -683,7 +737,9 @@ begin
     'public.admin_recent_activity()',
     'public.admin_users(text, text, int, int)',
     'public.admin_wallet_balances(text, int, int)',
-    'public.admin_delete_user(text, text)'
+    'public.admin_delete_user(text, text)',
+    'public._admin_pk_of(regclass)',
+    'public._admin_cascade_delete(regclass, text, int)'
   ] loop
     execute format('revoke all on function %s from public, anon, authenticated', fn);
     execute format('grant execute on function %s to service_role', fn);

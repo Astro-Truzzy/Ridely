@@ -2,6 +2,16 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 
+// How /api is served during `vite` dev:
+//   * Under `vercel dev` (VERCEL=1) the functions are served on the SAME origin,
+//     so we must NOT proxy — otherwise the proxy hijacks /api and forwards it
+//     away from the local functions. Detected via the VERCEL env var.
+//   * Plain `npm run dev`: proxy /api to a target. Defaults to production so the
+//     marketing site works without a local API; override with API_PROXY_TARGET
+//     (e.g. API_PROXY_TARGET=http://localhost:3000) to hit a local backend.
+const underVercelDev = process.env.VERCEL === '1'
+const apiTarget = process.env.API_PROXY_TARGET ?? 'https://www.ridelyweb.com'
+
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
@@ -9,13 +19,15 @@ export default defineConfig({
     tailwindcss(),
   ],
   server: {
-    proxy: {
-      '/api': {
-        target: 'https://www.ridelyweb.com',
-        changeOrigin: true,
-        secure: true,
-      },
-    },
+    proxy: underVercelDev
+      ? undefined
+      : {
+          '/api': {
+            target: apiTarget,
+            changeOrigin: true,
+            secure: true,
+          },
+        },
   },
   build: {
     target: 'es2020',
