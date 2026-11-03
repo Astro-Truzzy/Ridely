@@ -25,18 +25,29 @@ async function adminFetch<T>(path: string, init?: RequestInit): Promise<T> {
         ...init?.headers,
       },
     });
-  } catch {
+  } catch (err) {
+    // fetch() itself rejected: DNS, connection refused, TLS, or offline —
+    // the API never answered, so there is no status code to report.
+    console.error(`Admin API network error (${path}):`, err);
+    const host = window.location.hostname;
+    const onLocalhost =
+      host === "localhost" || host === "127.0.0.1" || host === "[::1]";
     throw new Error(
-      "Cannot reach the API. If you're on localhost, run the Vite dev server (npm run dev) so /api is proxied, and confirm ADMIN_PASSWORD is set on Vercel.",
+      onLocalhost
+        ? "Cannot reach the API. Run the Vite dev server (npm run dev) so /api is proxied."
+        : `Cannot reach the API (network error, no response). The page loaded but ${path} did not answer — confirm the latest code is deployed on Vercel and ADMIN_PASSWORD is set in the project environment variables.`,
     );
   }
 
-  const body = await response.json().catch(() => ({}));
+  const body = (await response.json().catch(() => ({}))) as {
+    error?: unknown;
+  };
 
   if (!response.ok) {
-    throw new Error(
-      typeof body.error === "string" ? body.error : "Request failed",
-    );
+    const serverMessage =
+      typeof body.error === "string" ? body.error : null;
+    console.error(`Admin API error ${response.status} (${path}):`, body);
+    throw new Error(serverMessage ?? `Request failed (HTTP ${response.status})`);
   }
 
   return body as T;

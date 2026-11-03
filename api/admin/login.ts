@@ -16,6 +16,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
+    if (!process.env.ADMIN_PASSWORD) {
+      console.error("Admin login misconfigured: ADMIN_PASSWORD is not set");
+      return res.status(500).json({ error: "Server is missing ADMIN_PASSWORD" });
+    }
+
     const { password } = req.body ?? {};
     if (!password || typeof password !== "string") {
       return res.status(400).json({ error: "Password is required" });

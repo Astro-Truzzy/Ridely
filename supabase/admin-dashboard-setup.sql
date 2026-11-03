@@ -699,7 +699,7 @@ returns jsonb language plpgsql security definer set search_path = public as $$
 declare
   v_role  text := lower(nullif(p_role, ''));
   v_table text;
-  v_found boolean := false;
+  v_found integer := 0;
 begin
   if p_id is null or v_role not in ('customer', 'rider') then
     return jsonb_build_object('deleted', false, 'error', 'invalid id/role');
