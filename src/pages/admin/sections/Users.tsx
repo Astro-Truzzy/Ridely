@@ -50,6 +50,8 @@ export default function Users({
   const [loading, setLoading] = useState(true);
   const [pendingDelete, setPendingDelete] = useState<AppUser | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [purgeLedger, setPurgeLedger] = useState(false);
+  const [purgeConfirm, setPurgeConfirm] = useState("");
 
   useEffect(() => {
     const t = setTimeout(() => setDebounced(search), 300);
@@ -81,6 +83,12 @@ export default function Users({
     load();
   }, [load]);
 
+  const openDelete = useCallback((u: AppUser) => {
+    setPendingDelete(u);
+    setPurgeLedger(false);
+    setPurgeConfirm("");
+  }, []);
+
   const confirmDelete = useCallback(async () => {
     if (!pendingDelete) return;
     setDeleting(true);
@@ -88,13 +96,16 @@ export default function Users({
       const res = await deleteAppUser({
         id: pendingDelete.id,
         role: pendingDelete.role,
+        purgeLedger,
       });
       toast.success(
         `${pendingDelete.name || "Account"} deleted${
-          res.authRemoved ? "" : " (login could not be removed)"
-        }`,
+          purgeLedger ? " (incl. ledger history)" : ""
+        }${res.authRemoved ? "" : " (login could not be removed)"}`,
       );
       setPendingDelete(null);
+      setPurgeLedger(false);
+      setPurgeConfirm("");
       // Drop the row locally, then refresh totals in the background.
       setUsers((prev) => prev.filter((u) => u.id !== pendingDelete.id));
       setTotal((t) => Math.max(t - 1, 0));
@@ -108,7 +119,7 @@ export default function Users({
     } finally {
       setDeleting(false);
     }
-  }, [pendingDelete, load, onAuthError]);
+  }, [pendingDelete, purgeLedger, load, onAuthError]);
 
   const maxPage = Math.max(Math.ceil(total / PAGE_SIZE) - 1, 0);
 
@@ -215,7 +226,7 @@ export default function Users({
                           </td>
                           <td className="px-4 py-3 text-right">
                             <button
-                              onClick={() => setPendingDelete(u)}
+                              onClick={() => openDelete(u)}
                               title={`Delete ${u.name}`}
                               aria-label={`Delete ${u.name}`}
                               className="inline-flex items-center justify-center p-1.5 rounded-lg text-[#a0a0b0] hover:text-red-400 hover:bg-red-500/10 transition-colors"
@@ -313,12 +324,29 @@ export default function Users({
             {pendingDelete?.email ? ` (${pendingDelete.email})` : ""} will be
             permanently removed — profile
             {pendingDelete?.role === "customer" ? ", wallet" : ""} and login
-            access. This cannot be undone.
+            access. Money history (ledger) is kept unless you opt in below;
+            without the opt-in the delete is refused while ledger rows exist.
+            This cannot be undone.
           </>
         }
         loading={deleting}
+        purgeOption={{
+          label:
+            "Also delete ledger history. Destroys this account's money trail permanently. Type PURGE below to arm, then tick this box.",
+          checked: purgeLedger,
+          onChange: setPurgeLedger,
+          purgeConfirmText: {
+            expected: "PURGE",
+            value: purgeConfirm,
+            onChange: setPurgeConfirm,
+          },
+        }}
         onConfirm={confirmDelete}
-        onCancel={() => setPendingDelete(null)}
+        onCancel={() => {
+          setPendingDelete(null);
+          setPurgeLedger(false);
+          setPurgeConfirm("");
+        }}
       />
     </div>
   );

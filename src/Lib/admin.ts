@@ -305,12 +305,20 @@ export function fetchAppUsers(params?: {
   }>(`/api/admin/app-users${qs ? `?${qs}` : ""}`);
 }
 
-/** Permanently delete a customer or rider (profile + wallet + auth login). */
+/**
+ * Permanently delete a customer or rider (profile + wallet + auth login).
+ * Financial history is kept by default: if ledger rows still reference the
+ * profile the delete is refused with a 409. Pass purgeLedger: true to also
+ * delete the ledger rows (money history is destroyed — the dashboard asks for
+ * explicit opt-in via checkbox before sending this).
+ */
 export function deleteAppUser(params: {
   id: string;
   role: "customer" | "rider";
+  purgeLedger?: boolean;
 }) {
   const query = new URLSearchParams({ id: params.id, role: params.role });
+  if (params.purgeLedger) query.set("purgeLedger", "true");
   return adminFetch<{ success: true; deleted: boolean; authRemoved: boolean }>(
     `/api/admin/app-users?${query.toString()}`,
     { method: "DELETE" },

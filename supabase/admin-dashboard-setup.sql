@@ -642,8 +642,13 @@ $$;
 -- rows before child rows), so each delete satisfies its own FK constraints.
 -- Only single-column foreign keys are followed (the norm here); depth is capped
 -- as a backstop against FK cycles.
+-- Append-only tables (see _admin_blocked_by_protected) are skipped by default
+-- so the financial audit trail survives. p_purge_protected = true deletes them
+-- too — admin-only, destroys money history, and temporarily disables their
+-- anti-delete trigger for the rows being removed.
 create or replace function public._admin_cascade_delete(
-  p_table regclass, p_id text, p_depth int default 0)
+  p_table regclass, p_id text, p_depth int default 0,
+  p_purge_protected boolean default false)
 returns void language plpgsql security definer set search_path = public as $$
 declare
   fk           record;
@@ -663,6 +668,14 @@ begin
     where con.contype = 'f'
       and con.confrelid = p_table
       and array_length(con.conkey, 1) = 1
+      -- Append-only financial history is skipped unless p_purge_protected.
+      -- Name comparison (not a ::regclass cast) keeps this working on
+      -- databases without a ledger. Add future append-only tables to the
+      -- list in the WHEN below and to _admin_blocked_by_protected.
+      and (
+        p_purge_protected
+        or con.conrelid::regclass::text not in ('ledger_entries', 'public.ledger_entries')
+      )
   loop
     child_pk_col := public._admin_pk_of(fk.child_table);
 
@@ -674,32 +687,161 @@ begin
         using p_id
       loop
         if not (fk.child_table = p_table and child_id.id = p_id) then
-          perform public._admin_cascade_delete(fk.child_table, child_id.id, p_depth + 1);
+          perform public._admin_cascade_delete(
+            fk.child_table, child_id.id, p_depth + 1, p_purge_protected);
         end if;
       end loop;
     end if;
 
-    execute format('delete from %s where %I::text = $1', fk.child_table, fk.child_col)
-      using p_id;
+    -- Purge mode: the append-only guard trigger would reject these deletes,
+    -- so it is disabled for exactly the statement that removes them, then
+    -- re-enabled. (Session-local ALTER TABLE still needs the function's
+    -- definer rights — hence security definer.)
+    if p_purge_protected
+       and fk.child_table::text in ('ledger_entries', 'public.ledger_entries') then
+      perform public._admin_delete_append_only(fk.child_table, fk.child_col, p_id);
+    else
+      execute format('delete from %s where %I::text = $1', fk.child_table, fk.child_col)
+        using p_id;
+    end if;
   end loop;
+end; $$;
+
+-- Delete rows from an append-only table by briefly disabling its guard
+-- trigger(s) for exactly one DELETE statement, then re-enabling them.
+-- Only the trigger(s) whose function body contains the append-only marker are
+-- touched; every other trigger on the table is left alone. The trigger is
+-- restored even if the DELETE fails.
+create or replace function public._admin_delete_append_only(
+  p_table regclass, p_col text, p_id text)
+returns void language plpgsql security definer set search_path = public as $$
+declare
+  trg text;
+begin
+  for trg in
+    select t.tgname
+    from pg_trigger t
+    where t.tgrelid = p_table
+      and not t.tgisinternal
+      and exists (
+        select 1 from pg_proc p
+        where p.oid = t.tgfoid
+          and lower(p.prosrc) like '%append-only%'
+      )
+  loop
+    execute format('alter table %s disable trigger %I', p_table, trg);
+  end loop;
+
+  begin
+    execute format('delete from %s where %I::text = $1', p_table, p_col)
+      using p_id;
+  exception when others then
+    -- Restore the guard before the error propagates, so a failed purge
+    -- never leaves the ledger unprotected.
+    for trg in
+      select t.tgname
+      from pg_trigger t
+      where t.tgrelid = p_table
+        and not t.tgisinternal
+        and exists (
+          select 1 from pg_proc p
+          where p.oid = t.tgfoid
+            and lower(p.prosrc) like '%append-only%'
+        )
+    loop
+      execute format('alter table %s enable trigger %I', p_table, trg);
+    end loop;
+    raise;
+  end;
+
+  for trg in
+    select t.tgname
+    from pg_trigger t
+    where t.tgrelid = p_table
+      and not t.tgisinternal
+      and exists (
+        select 1 from pg_proc p
+        where p.oid = t.tgfoid
+          and lower(p.prosrc) like '%append-only%'
+      )
+  loop
+    execute format('alter table %s enable trigger %I', p_table, trg);
+  end loop;
+end; $$;
+
+-- Append-only tables that must survive a NORMAL profile deletion (financial
+-- audit trail). _admin_cascade_delete never issues DELETE against these unless
+-- p_purge_protected is true, and admin_delete_user refuses up-front (with an
+-- actionable message) when a row in one still references the profile —
+-- hard-deleting money history would both trip its trigger and destroy the
+-- ledger. If the profile's ledger balance still needs to go somewhere, post a
+-- reversal/adjustment row first.
+create or replace function public._admin_blocked_by_protected(p_id text)
+returns text language plpgsql stable security definer set search_path = public as $$
+declare
+  v_cols  text[];
+  v_where text;
+  v_count int;
+begin
+  if to_regclass('public.ledger_entries') is null then
+    return null;
+  end if;
+
+  -- Only reference owner columns that actually exist, so an unknown ledger
+  -- schema can neither crash this check nor block unrelated deletes.
+  select coalesce(array_agg(c.column_name::text), '{}') into v_cols
+  from information_schema.columns c
+  where c.table_schema = 'public'
+    and c.table_name = 'ledger_entries'
+    and c.column_name in (
+      'user_id', 'rider_id', 'account_id', 'profile_id',
+      'owner_id', 'customer_id'
+    );
+
+  if v_cols = '{}' then
+    -- Ledger exists but names its owner column differently: refuse rather than
+    -- guess, so money history is never wiped by accident.
+    return 'profile is referenced by append-only ledger_entries; clear it with a reversal/adjustment row instead';
+  end if;
+
+  select string_agg(format('%I::text = $1', col), ' or ') into v_where
+  from unnest(v_cols) as col;
+
+  execute 'select count(*) from public.ledger_entries where ' || v_where
+    into v_count using p_id;
+
+  if v_count > 0 then
+    return 'ledger_entries is append-only; post a reversal/adjustment row instead';
+  end if;
+  return null;
 end; $$;
 
 -- ── admin_delete_user(id, role) ─────────────────────────────────────────────
 -- Hard-deletes an app profile (customer → users, rider → riders) together with
--- EVERY row that references it — wallet, deliveries, transactions, verification
+-- every row that references it — wallet, deliveries, transactions, verification
 -- docs, etc. — via _admin_cascade_delete. That cascade is what lets us remove a
 -- customer who already has deliveries without tripping deliveries_user_id_fkey,
 -- and it adapts automatically as new dependent tables are added.
--- NOTE: this discards the profile's operational/financial history along with it.
+-- Append-only financial history (ledger_entries) is EXCLUDED: the audit trail
+-- survives deletion, and the delete is refused while ledger rows still reference
+-- the profile — post a reversal/adjustment row first. So operational history
+-- is discarded with the profile, but money history is not.
 -- Auth (auth.users) removal is done by the API using the admin auth API, not
 -- here. Returns {deleted: bool, auth_id: text|null} — auth_id is the profile's
 -- id, which for this app equals the Supabase auth uid, so the API can drop login.
-create or replace function public.admin_delete_user(p_id text, p_role text)
+-- Returns {deleted: false, error: ...} (not an exception) on refusal so the API
+-- can surface the message in the dashboard toast.
+-- p_purge_ledger = true also deletes ledger_entries rows (guard trigger
+-- briefly disabled, money history destroyed). Default false: ledger survives,
+-- and the delete is refused while ledger rows still reference the profile.
+create or replace function public.admin_delete_user(
+  p_id text, p_role text, p_purge_ledger boolean default false)
 returns jsonb language plpgsql security definer set search_path = public as $$
 declare
-  v_role  text := lower(nullif(p_role, ''));
-  v_table text;
-  v_found integer := 0;
+  v_role       text := lower(nullif(p_role, ''));
+  v_table      text;
+  v_found      integer := 0;
+  block_reason text;
 begin
   if p_id is null or v_role not in ('customer', 'rider') then
     return jsonb_build_object('deleted', false, 'error', 'invalid id/role');
@@ -711,9 +853,20 @@ begin
     return jsonb_build_object('deleted', false, 'error', 'table missing');
   end if;
 
+  -- Normal mode: refuse before touching anything — append-only money history
+  -- must be settled with a reversal/adjustment row first, never hard-deleted
+  -- with the profile. Purge mode: skip the check and take the ledger too.
+  if not p_purge_ledger then
+    block_reason := public._admin_blocked_by_protected(p_id);
+    if block_reason is not null then
+      return jsonb_build_object('deleted', false, 'error', block_reason);
+    end if;
+  end if;
+
   -- Remove every dependent row that points at this profile before the profile
   -- row itself, so no RESTRICT foreign key blocks the delete.
-  perform public._admin_cascade_delete(('public.' || v_table)::regclass, p_id);
+  perform public._admin_cascade_delete(
+    ('public.' || v_table)::regclass, p_id, 0, p_purge_ledger);
 
   execute format('delete from public.%I where id::text = $1', v_table)
     using p_id;
@@ -737,9 +890,11 @@ begin
     'public.admin_recent_activity()',
     'public.admin_users(text, text, int, int)',
     'public.admin_wallet_balances(text, int, int)',
-    'public.admin_delete_user(text, text)',
+    'public.admin_delete_user(text, text, boolean)',
+    'public._admin_blocked_by_protected(text)',
+    'public._admin_delete_append_only(regclass, text, text)',
     'public._admin_pk_of(regclass)',
-    'public._admin_cascade_delete(regclass, text, int)'
+    'public._admin_cascade_delete(regclass, text, int, boolean)'
   ] loop
     execute format('revoke all on function %s from public, anon, authenticated', fn);
     execute format('grant execute on function %s to service_role', fn);

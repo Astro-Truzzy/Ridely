@@ -54,10 +54,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           .json({ error: 'Query must include id and role "customer" | "rider"' });
       }
 
+      // purgeLedger=true also deletes ledger_entries rows (money history is
+      // destroyed). Only reachable from the dashboard's explicit purge checkbox.
+      const purgeLedger =
+        req.query.purgeLedger === "true" || req.query.purgeLedger === "1";
+      if (purgeLedger) {
+        console.warn(`Admin purge-ledger delete of ${role} ${id}`);
+      }
+
       const result = await callRpc<AdminDeleteResult>(
         supabase,
         "admin_delete_user",
-        { p_id: id, p_role: role },
+        { p_id: id, p_role: role, p_purge_ledger: purgeLedger },
       );
 
       if (!result.available) {
@@ -66,7 +74,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         });
       }
       if (result.data?.error) {
-        return res.status(500).json({ error: result.data.error });
+        // Business-rule refusal (e.g. append-only ledger still references the
+        // profile) is a conflict, not a server failure — surface it as 409 so
+        // logs and the dashboard toast read correctly.
+        const refusal = /ledger|append-only|reversal/i.test(result.data.error);
+        return res
+          .status(refusal ? 409 : 500)
+          .json({ error: result.data.error });
       }
       if (!result.data?.deleted) {
         return res.status(404).json({ error: "User not found" });

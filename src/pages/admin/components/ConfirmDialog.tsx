@@ -12,6 +12,7 @@ export default function ConfirmDialog({
   message,
   confirmLabel = "Delete",
   loading = false,
+  purgeOption,
   onConfirm,
   onCancel,
 }: {
@@ -20,6 +21,18 @@ export default function ConfirmDialog({
   message: React.ReactNode;
   confirmLabel?: string;
   loading?: boolean;
+  /**
+   * Optional extra-destructive opt-in rendered above the buttons (e.g. "also
+   * delete ledger history"). Fully controlled by the caller: label to show,
+   * current checked state, and change handler. Pass purgeConfirmText to
+   * require typing a word before the box can be checked.
+   */
+  purgeOption?: {
+    label: string;
+    checked: boolean;
+    onChange: (checked: boolean) => void;
+    purgeConfirmText?: { expected: string; value: string; onChange: (v: string) => void };
+  };
   onConfirm: () => void;
   onCancel: () => void;
 }) {
@@ -52,6 +65,34 @@ export default function ConfirmDialog({
                 <div className="text-sm text-[#a0a0b0] mt-1">{message}</div>
               </div>
             </div>
+
+            {purgeOption && (
+              <label className="mt-4 flex cursor-pointer items-start gap-2.5 rounded-lg border border-red-500/30 bg-red-500/[0.06] p-3">
+                <input
+                  type="checkbox"
+                  checked={purgeOption.checked}
+                  onChange={(e) => purgeOption.onChange(e.target.checked)}
+                  disabled={
+                    loading ||
+                    (purgeOption.purgeConfirmText != null &&
+                      purgeOption.purgeConfirmText.value.trim().toLowerCase() !==
+                        purgeOption.purgeConfirmText.expected.toLowerCase())
+                  }
+                  className="mt-0.5 h-4 w-4 shrink-0 accent-red-600"
+                />
+                <span className="text-xs text-red-200/90">{purgeOption.label}</span>
+              </label>
+            )}
+            {purgeOption?.purgeConfirmText && purgeOption.checked && (
+              <input
+                type="text"
+                value={purgeOption.purgeConfirmText.value}
+                onChange={(e) => purgeOption.purgeConfirmText!.onChange(e.target.value)}
+                disabled={loading}
+                placeholder={`Type ${purgeOption.purgeConfirmText.expected} to arm the checkbox above`}
+                className="mt-2 w-full bg-[#1a1a2e] border border-white/[0.08] text-white text-sm px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600 placeholder:text-[#a0a0b0]/60"
+              />
+            )}
 
             <div className="mt-6 flex justify-end gap-2">
               <button
