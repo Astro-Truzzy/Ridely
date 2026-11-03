@@ -1,4 +1,9 @@
-const API_BASE = import.meta.env.VITE_API_URL ?? "";
+// Same-origin by default (VITE_API_URL unset): no CORS, no preflight, works on
+// apex, www, preview deployments, and localhost (via the Vite proxy).
+// Only set VITE_API_URL locally (in .env.local, never in Vercel) when you need
+// local dev against a deployed API — baking an absolute URL into a build makes
+// every other host cross-origin, and apex↔www redirects kill CORS preflights.
+const API_BASE = (import.meta.env.VITE_API_URL ?? "").replace(/\/+$/, "");
 const TOKEN_KEY = "ridely_admin_token";
 
 export function getAdminToken(): string | null {

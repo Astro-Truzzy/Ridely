@@ -1,5 +1,5 @@
 const SESSION_KEY = "ridely_sid";
-const API_BASE = import.meta.env.VITE_API_URL ?? "";
+const API_BASE = (import.meta.env.VITE_API_URL ?? "").replace(/\/+$/, "");
 
 function getSessionId(): string {
   let id = localStorage.getItem(SESSION_KEY);
